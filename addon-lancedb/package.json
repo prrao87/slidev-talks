@@ -1,0 +1,10 @@
+{
+  "name": "slidev-addon-lancedb",
+  "version": "0.1.0",
+  "description": "Shared LanceDB brand theme for Slidev talks — palette, fonts, layouts, components, and a logo/slide-number footer.",
+  "private": true,
+  "keywords": ["slidev-addon"],
+  "engines": {
+    "slidev": ">=0.48.0"
+  }
+}
