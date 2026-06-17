@@ -1,0 +1,82 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnpm-store/
+
+# Slidev / Vite generated state
+.slidev/
+**/.slidev/
+dist/
+**/dist/
+.vite/
+.cache/
+.output/
+
+# Hosting provider local state
+.vercel/
+.netlify/
+
+# Generated Slidev exports / deliverables
+*.pdf
+*.ppt
+*.pptx
+*.pps
+*.ppsx
+*.key
+*.odp
+slides-export/
+**/slides-export/
+
+# Generated recordings / large media exports
+*.mp4
+*.mov
+*.webm
+*.m4v
+
+# Generated raster exports. Keep real source assets in deck/theme asset folders below.
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.avif
+
+# Source assets that are needed to reproduce decks
+!public/
+!public/**
+!talks/**/public/
+!talks/**/public/**
+!talks/**/assets/
+!talks/**/assets/**
+!addon-lancedb/assets/
+!addon-lancedb/assets/**
+
+# Local planning / scratch artifacts
+scratch/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment / local secrets
+.env
+.env.*
+!.env.example
+
+# OS/editor/assistant noise
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.local
+.claude/
+.agents/
+.codex/
+
+# Nested repos accidentally created under talks/
+talks/**/.git/

@@ -1,0 +1,190 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   LanceDB brand theme for Slidev — ported from the HTML slide template.
+   Design tokens, base slide surface, typography utilities, and the
+   reusable component classes (.eyebrow, .badge, .callout, .code-block,
+   .bullet-list, .stat, gradient text).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Surfaces */
+  --bg:          #1a1613;
+  --bg-elev:     #221d18;
+  --bg-elev-2:   #2a241e;
+  --bg-deep:     #14110e;
+
+  /* Text */
+  --fg:          #f0e7dc;
+  --fg-muted:    #a89a8b;
+  --fg-dim:      #6e6357;
+
+  /* Accent */
+  --accent:      #e97852;
+  --accent-soft: #f4a484;
+  --accent-deep: #d96746;
+
+  /* Lines */
+  --border:        rgba(240, 231, 220, 0.08);
+  --border-strong: rgba(240, 231, 220, 0.16);
+}
+
+/* ── Slide surface ──────────────────────────────────────────────────── */
+.slidev-layout {
+  background: var(--bg);
+  color: var(--fg);
+  /* Subtle dot grain for atmosphere — survives print */
+  background-image: radial-gradient(circle at 1px 1px, rgba(240, 231, 220, 0.022) 1px, transparent 0);
+  background-size: 28px 28px;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+}
+
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3,
+.slidev-layout h4 {
+  color: var(--fg);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.slidev-layout a { color: var(--accent); }
+.slidev-layout strong { color: var(--accent-soft); font-weight: 600; }
+.slidev-layout hr { border-color: var(--border); }
+
+/* ── Typography utilities ───────────────────────────────────────────── */
+.eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.subtitle {
+  font-size: 21px;
+  line-height: 1.5;
+  color: var(--fg-muted);
+  font-weight: 400;
+}
+
+.lede {
+  font-size: 19px;
+  color: var(--fg-muted);
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+.gradient-text {
+  background: linear-gradient(120deg, #f4a484 0%, #e97852 55%, #d96746 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+/* In PDF print, -webkit-background-clip:text bleeds a sliver below the clip.
+   Force solid color in print. */
+@media print {
+  .gradient-text {
+    background: none;
+    color: var(--accent-soft);
+    -webkit-text-fill-color: var(--accent-soft);
+  }
+}
+
+/* ── Reusable component classes ─────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(233, 120, 82, 0.12);
+  border: 1px solid rgba(233, 120, 82, 0.32);
+  border-radius: 999px;
+  color: var(--accent-soft);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+.callout {
+  border-left: 3px solid var(--accent);
+  background: linear-gradient(90deg, rgba(233, 120, 82, 0.10), rgba(233, 120, 82, 0.0) 70%);
+  padding: 20px 28px;
+  border-radius: 0 10px 10px 0;
+  color: var(--fg);
+  font-size: 17px;
+  line-height: 1.55;
+}
+.callout strong { color: var(--accent-soft); font-weight: 600; }
+
+/* Code: themed blocks for both Slidev-highlighted fences and manual .code-block */
+.slidev-layout pre,
+.code-block {
+  background: var(--bg-deep) !important;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.code-block {
+  padding: 24px 28px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--fg);
+  white-space: pre;
+  overflow: hidden;
+}
+.code-block .kw  { color: var(--accent); }
+.code-block .str { color: #a8c590; }
+.code-block .num { color: #d4b572; }
+.code-block .com { color: var(--fg-dim); font-style: italic; }
+
+.bullet-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+}
+.bullet-list li {
+  position: relative;
+  padding-left: 24px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+.bullet-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 13px;
+  width: 7px; height: 7px;
+  background: var(--accent);
+}
+.bullet-list li strong { color: var(--fg); font-weight: 600; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.stat {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent 80%);
+  border-radius: 16px;
+  padding: 28px 30px;
+  display: flex; flex-direction: column; gap: 10px;
+  min-height: 180px;
+}
+.stat .num {
+  font-size: 64px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.stat .label {
+  font-size: 14px;
+  color: var(--fg-muted);
+  line-height: 1.45;
+  margin-top: auto;
+}
