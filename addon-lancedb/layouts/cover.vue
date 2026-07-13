@@ -17,9 +17,14 @@
     ::hero::
     <img src="/hero.png" alt="" />
 -->
+<script setup lang="ts">
+import logo from '../assets/lancedb-logo.png'
+</script>
+
 <template>
   <div class="slidev-layout lance-cover">
     <div class="left">
+      <img class="cover-logo" :src="logo" alt="LanceDB" />
       <slot />
     </div>
     <div class="right">
@@ -37,6 +42,13 @@
   height: 100%;
 }
 .left { display: flex; flex-direction: column; gap: 26px; }
+.cover-logo {
+  height: 34px;
+  width: auto;
+  align-self: flex-start;
+  margin-bottom: 6px;
+  opacity: 0.95;
+}
 .left :deep(h1) {
   font-size: 64px;
   line-height: 1.02;

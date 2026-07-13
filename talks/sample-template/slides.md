@@ -12,8 +12,8 @@ info: KGC 2026 talk, styled with the LanceDB brand addon.
 canvasWidth: 1280
 aspectRatio: 16/9
 fonts:
-  sans: Hanken Grotesk
-  mono: JetBrains Mono
+  sans: Geist
+  mono: Geist Mono
   weights: '300,400,500,600,700,800'
 transition: slide-left
 # The headmatter is also slide 1's frontmatter, so slide 1 is the cover.
@@ -87,7 +87,7 @@ Deliver the headline slowly, then pause ~3 seconds before continuing.
 
 # Themed code
 
-<p class="lede">Fenced code blocks pick up the dark deep surface and JetBrains Mono automatically.</p>
+<p class="lede">Fenced code blocks pick up the dark deep surface and Geist Mono automatically.</p>
 
 ```python
 import lancedb

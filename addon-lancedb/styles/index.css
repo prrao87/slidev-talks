@@ -6,21 +6,21 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Surfaces */
-  --bg:          #1a1613;
-  --bg-elev:     #221d18;
+  /* Surfaces — warm near-black, matching the PPTX deck */
+  --bg:          #14110e;
+  --bg-elev:     #201b16;
   --bg-elev-2:   #2a241e;
-  --bg-deep:     #14110e;
+  --bg-deep:     #0f0d0b;
 
   /* Text */
   --fg:          #f0e7dc;
   --fg-muted:    #a89a8b;
   --fg-dim:      #6e6357;
 
-  /* Accent */
-  --accent:      #e97852;
-  --accent-soft: #f4a484;
-  --accent-deep: #d96746;
+  /* Accent — the deck's signature orange (FF734A → E8593C) */
+  --accent:      #ff734a;
+  --accent-soft: #ff9e80;
+  --accent-deep: #e8593c;
 
   /* Lines */
   --border:        rgba(240, 231, 220, 0.08);
@@ -29,12 +29,16 @@
 
 /* ── Slide surface ──────────────────────────────────────────────────── */
 .slidev-layout {
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--fg);
-  /* Subtle dot grain for atmosphere — survives print */
-  background-image: radial-gradient(circle at 1px 1px, rgba(240, 231, 220, 0.022) 1px, transparent 0);
-  background-size: 28px 28px;
-  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  /* Warm ember glow anchored bottom-right + a faint square grid — the
+     PPTX deck's motif. The glow + grid survive print. */
+  background-image:
+    radial-gradient(ellipse 90% 90% at 100% 108%, rgba(255, 115, 74, 0.16), transparent 55%),
+    linear-gradient(rgba(240, 231, 220, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240, 231, 220, 0.028) 1px, transparent 1px);
+  background-size: 100% 100%, 64px 64px, 64px 64px;
+  font-family: 'Geist', system-ui, sans-serif;
 }
 
 .slidev-layout h1,
@@ -46,13 +50,26 @@
   font-weight: 600;
 }
 
+/* Default content slides: drop the title box down to ~19% from the top so
+   it lines up with the PPTX title placeholder (y ≈ 1.05" of 5.625"), and
+   clear the top-left logo. Custom layouts (cover/statement/closing) center
+   their own content and are unaffected. */
+.slidev-layout.default {
+  padding: 128px 96px 72px;
+}
+.slidev-layout.default > h1:first-child {
+  font-size: 40px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
 .slidev-layout a { color: var(--accent); }
 .slidev-layout strong { color: var(--accent-soft); font-weight: 600; }
 .slidev-layout hr { border-color: var(--border); }
 
 /* ── Typography utilities ───────────────────────────────────────────── */
 .eyebrow {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Geist Mono', ui-monospace, monospace;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -124,7 +141,7 @@
   background: var(--bg-deep) !important;
   border: 1px solid var(--border);
   border-radius: 12px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Geist Mono', ui-monospace, monospace;
 }
 .code-block {
   padding: 24px 28px;

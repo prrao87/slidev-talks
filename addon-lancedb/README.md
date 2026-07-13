@@ -1,8 +1,8 @@
 # slidev-addon-lancedb
 
-Shared LanceDB brand for Slidev talks — ported from the HTML slide template.
-Drop it into any deck and you get the palette, fonts, the logo + slide-number
-footer, branded layouts, and reusable components.
+Shared LanceDB brand for Slidev talks — aligned with the LanceDB PPTX deck.
+Drop it into any deck and you get the palette, Geist fonts, the top-left logo,
+branded layouts, and reusable components.
 
 ## Use it in a deck
 
@@ -14,8 +14,8 @@ addons:
 canvasWidth: 1280         # template is designed at 1280×720
 aspectRatio: 16/9
 fonts:
-  sans: Hanken Grotesk
-  mono: JetBrains Mono
+  sans: Geist
+  mono: Geist Mono
 ---
 ```
 
@@ -35,8 +35,8 @@ fonts:
 - `.gradient-text`, `.subtitle`, `.lede`, `.eyebrow`
 - `.badge` (+ `.dot`), `.callout`, `.code-block`, `.bullet-list`, `.stat` / `.stat-grid`
 
-**Global** — `global-bottom.vue` paints the LanceDB logo (top-right) and the
-`NN / NN` slide number (bottom-left) on every slide automatically.
+**Global** — `global-bottom.vue` paints the LanceDB logo (top-left) on every
+content slide automatically (skipped on the `cover`, which has its own logo).
 
 ## Brand tokens
 

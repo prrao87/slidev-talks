@@ -36,7 +36,7 @@ defineProps<{ name: string; role?: string; avatar?: string }>()
 .name { font-size: 16px; font-weight: 500; color: var(--fg); }
 .role {
   font-size: 12.5px; color: var(--fg-dim);
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Geist Mono', ui-monospace, monospace;
   letter-spacing: 0.04em;
 }
 </style>

@@ -27,8 +27,12 @@ layout: cover
 <Presenter name="Prashanth Rao" role="AI ENGINEER · LANCEDB" avatar="/prashanth.jpg" />
 <Presenter name="Sarwar Bhuiyan" role="SOLUTIONS ENGINEER · LANCEDB" avatar="/sarwar.jpg" />
 
+<div class="repo-cta">Clone &amp; follow along → <a href="https://github.com/lancedb/tmls-2026-demo">github.com/lancedb/tmls-2026-demo</a></div>
+
 <style>
 .lance-cover h1 { font-size: 52px; line-height: 1.12; }
+.repo-cta { margin-top: 18px; font-family: var(--font-mono,'JetBrains Mono'); font-size: 14px; color: var(--accent-soft); }
+.repo-cta a { color: var(--accent-soft); text-decoration: none; border-bottom: 1px solid var(--accent); }
 </style>
 
 ::hero::
@@ -36,9 +40,24 @@ layout: cover
 ![Multimodal data illustration](./assets/hero.png)
 
 <!--
-Opening (30s). Welcome the room, thank TMLS. Frame in one sentence:
-this 25 min is the WHY; the next 3 hours of the workshop are the HOW.
-Pause after the title.
+Good afternoon, everyone — thanks for being here, and thank you to the TMLS team
+for having us.
+
+I'm Prashanth, AI engineer at LanceDB, and I'm here with my colleague Sarwar,
+who's a solutions engineer on our team.
+
+Rather than just jumping into code, I think a quick primer on what Lance is, would be useful.
+So here's how we'll break down the next couple hours:
+we'll begin with a talk — the next twenty-five minutes or so — it's the WHY and the WHAT.
+Why training data pipelines look the way they do today, why that's a problem, and
+what we think a better foundation looks like. After that is the hands-on
+portion — the HOW. We'll run the code on a free Colab instance and walk through it.
+
+If you see something in the next few slides you want to try, hold onto it — you'll get your hands on it shortly. 
+
+The slides and notebook are on the repo on screen — github.com/lancedb/tmls-2026-demo (also shared beforehand) — so feel free to clone it now and have them open.
+
+So: Our topic today is enhancing training data pipelines with Lance and the multimodal lakehouse.
 -->
 
 ---
@@ -59,8 +78,16 @@ feeding GPUs that spend most of their cycles lying unused, waiting for data...
 </p>
 
 <!--
-Deliver the headline slowly. The enemy in this talk is the STACK, not any one
-format. Don't mention Lance or Parquet yet — establish the pain first. ~90s.
+Here's the claim I want to start with, and it's one that surprises people: for
+many teams training models today, the thing slowing down research isn't compute.
+It's data.
+
+We tend to assume the bottleneck is GPUs — that if we just had more H100s, or a bigger cluster, we'd move faster. But talk to the people actually building these pipelines (hopefully some of you are in this room today), and you hear a different story. The expensive hardware is sitting there, underused, while the team spends its time wrangling data into a shape the GPU can consume efficiently.
+
+The reason isn't any single tool being slow. It's the overall stack. The way we feed GPUs and built training data pipelines today is a pile of systems bolted together — six systems, on a good day — and that whole assembly gets torn down and rebuilt almost every week as the data changes. The GPUs spend most of their cycles waiting on data.
+
+So before we talk about any solution, I want to sit with that problem for a
+minute, because it's one of the key things LanceDB is trying to fix.
 -->
 
 ---
@@ -123,9 +150,34 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-Walk left→center→right: petabytes of multimodal data, six systems to serve it,
-GPUs idle. Then the three failures along the bottom. ~2 min. Land:
-"You didn't buy a slow GPU. You built a data stack that can't keep it fed."
+So this is what that stack actually looks like. Let's walk across it,
+left to right.
+
+On the left is the data itself — and notice the scale. Petabytes of video and
+audio, hundreds of billions of frames and embeddings, captions, latents. This is
+multimodal data, and it's enormous.
+
+In the middle is everything you stand up to serve that data to a model. For multimodal data,
+the raw bytes — the images and video — sit in blob storage like S3. The tabular metadata
+goes into Parquet. Robotics or episodic data lands in something like lerobot. Your
+embeddings live in a vector database so you can do similarity search. A traditional database
+or feature store tracks the derived metadata. And then — holding all of it together — is a
+pile of custom Python glue that nobody really owns. That's six systems, and the
+data is constantly moving between them: re-sharded, re-embedded, re-indexed, and
+re-joined by timestamp every time something changes.
+
+And on the right is the GPU fleet — the most expensive part of the setup — sitting
+idle. Waiting on the dataloader to assemble the next batch out of all those
+systems.
+
+The result is the three failures along the bottom. First, weekly churn: change one
+filter — say you swap in a new caption model — you rewrite the whole dataset and
+retrain on a moving target. Second, there's no atomicity: your blobs, your metadata, and
+your vectors live in different places, so there's no single commit that ties a
+dataset together. And third, it's not easily reproducible: your datasets are just folders
+with dates on them, and reproducing last quarter's checkpoint becomes like archaeology.
+
+So the main point here is: you GPU's aren't slow. Your larger data stack likely can't keep it fed.
 -->
 
 ---
@@ -142,10 +194,18 @@ the same bytes, different read patterns. The six boxes collapse into one.
 </p>
 
 <!--
-Pivot to the positive. Introduce Lance directly, on its OWN merits — no Parquet
-contrast yet. "We're building Lance, it's open source, and here's what it does
-for you." Name the layering honestly: Lance = the format (pylance SDK);
-LanceDB = the multimodal retrieval library on top.
+So that's the problem. Now let's come to the solution, that the Lance community has landed on.
+
+Lance is an open lakehouse format built specifically for AI
+data. It's fully open source with an Apache 2 license.
+
+The core idea is simple: instead of six systems, you have one. The same table serves
+all the things that were spread across the traditional stack — curating data,
+engineering features on it, searching it, and training on it. It's the same dataset and raw bytes
+underneath; the difference is just how it's stored on disk, and the read pattern you ask for.
+Curation scans
+whole columns; training reads individual samples. Same data, one place. The six
+boxes collapse into one.
 -->
 
 ---
@@ -215,10 +275,38 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-The "what is LanceDB" architecture slide. Bottom-up: Lance OSS format is the
-substrate (Layer 01); managed tables (02) and the feature platform / Geneva (03)
-write back to the SAME tables. Same bytes, three audiences. ~1.5 min, then zoom
-into the format's properties on the next slide.
+First, a bit of naming, since you'll hear both terms today. Lance is the format —
+the open file and table format you use through a Python SDK. LanceDB is the
+open-source retrieval library on top of it, giving you the APIs for search,
+indexing, and data management.
+
+These three layers are how they fit together — let me build it from the bottom up.
+
+At the bottom, Layer 1, is the Lance format itself. This is the open-source
+storage layer: a multimodal columnar format that stores blobs, vectors, nested fields and scalars
+together. It's versioned, and runs natively on object storage — S3, GCS, Azure. And
+it's readable from the tools you already use: Pandas, PyTorch, Ray, Spark, DuckDB.
+This layer is about owning your storage with no lock-in.
+
+Layer 2 is LanceDB managed tables. This is where the data management convenience features live:
+vector search, full-text search, scalar filters — all in one engine — plus simple ways to
+do dataset branching, versioning, cleanup, and access a fast, native PyTorch dataloader.
+
+And Layer 3 on top is the full-fledged distributed data platform that LanceDB, the company builds
+This layer contains advanced utilities that separate storage from compute, distribute querying and indexing
+across many workers, and make feature engineering scalable yet simple. We won't cover
+that layer today, but it's definitely worth knowing about.
+
+The crucial thing is that every one of these layers operates on the same tables. When
+you compute a new caption or a new embedding, it lands as a column on the Lance table that's
+already there. So it's the same bytes underneath, just serving three different audiences — Lance format
+is typically used by platform teams building out their own data lakes,
+LanceDB is widely used by AI engineers or reearchers for data management, and research.
+
+The third layer is LanceDB Enterprise, which is what we call the multimodal lakehouse, used by teams who
+want to scale LanceDB to petabytes of data.
+
+Now let's zoom into what makes the Lance format capable of immense scale and performance.
 -->
 
 ---
@@ -257,9 +345,30 @@ class: flex flex-col justify-center
 </div>
 
 <!--
-~2 min. Touch each card. The "50–100× vs Parquet" stat is the ONE soft contrast
-we allow here (decided) — the full head-to-head lands in the benchmarks. Keep
-the tone "here's what it gives you," not "vs them."
+It all comes down to three properties of the
+Lance format — and the interesting part is that no other open format has all
+three at once.
+
+The first is fast random access, without giving up full column scan performance.
+A training data pipeline doesn't always need a a whole row group — it may need just one
+frame, one sample, at a time, but shuffled. That's a mixed workload. Parquet wasn't
+built for this.
+
+Lance gives you 50 to 100 times faster random access than
+Parquet, in at most 1-2 IOPS. And, crucially, you keep the fast full-column scans you may
+need for curation and feature engineering. You don't pick one or the other; you get both.
+
+The second aspect is data evolution. It's more than just schema evolution: Adding a column
+— a new caption, a new score, a new embedding — is a zero-copy operation that writes only new
+data. The existing bytes are never rewritten. So
+re-captioning your dataset, or adding a small new column of integers, doesn't mean copying
+the table; it's just a new column written next to what's already there.
+
+The third is that multimodal data is truly a first-class citizen — one table manages the blobs,
+tensors, vectors, nested fields and scalars. No sidecar files to keep them in
+sync, and no separate indexing system to plug into. And the vector, full-text, and scalar
+indexes live right alongside the raw assets, so you can search across the whole
+record in a single engine with a consistent API.
 -->
 
 ---
@@ -294,10 +403,56 @@ class: flex flex-col justify-center
 </div>
 
 <!--
-The heavyweight (~2.5 min). The 2D-growth diagram is the anchor: rows are routine
-everywhere; columns are where other formats rewrite. Lance writes only the new
-column as a fragment + version; compaction handles fragment size. Land the
-PB-table / few-MB-write point — it's the one that makes people lean in.
+Let's spend a minute unpacking what we mean by data evolution - it's a bigger idea
+than schema evolution, and it's one of the biggest enabling features of Lance for petabyte scale
+AI data.
+
+Think about the two ways a dataset grows. One is vertically — you collect more
+observations, more images, more episodes, and add more rows. Every format like Parquet and Iceberg
+handle that fine; you just add more rows.
+
+The other direction is horizontally — adding columns. That's what feature engineering
+is all about. You compute a new image caption, a new aesthetic score, a new embedding, and
+you want to attach it to every row. New records grow vertically, new features
+grow horizontally. The table is evolving in both directions.
+
+Here's the catch: that horizontal direction is exactly where the other file formats
+struggle. In Parquet, adding one populated column means rewriting the whole table —
+even the columns you didn't touch. We call that write amplification: the cost scales
+with the size of the entire table, not the feature you're adding. So on a large
+dataset, attaching a small feature can mean rewriting terabytes.
+
+Lance doesn't work that way. Each column lives in its own data file, so adding a
+column just writes new files for that one column and points a new version of the
+table at them — nothing else is rewritten.
+
+And here's the point to take away: backfill a a small feature colum of a few megabytes onto a
+petabyte-scale table, and you *only* write a few megabytes — the existing table that's a
+petabyte in size remains untouched. That's the
+difference between a new caption model being an afternoon experiment versus a
+multi-day data rebuild. Multiple people from multiple teams can independently run experiments
+that write to a given table without table locks, which matters at scale.
+
+---
+ADDENDUM — the "why" behind Parquet's write amplification, if asked:
+
+You'd think adding a column would be cheap in a columnar format. The subtle part:
+Parquet IS columnar, but only within a row group. Each file packs its columns into
+row groups, and the file's footer records the schema plus the exact byte offset of
+every column's chunk in every row group. Two things follow. First, the file is
+immutable — there's no way to splice a new column's chunks into the middle of each
+row group, because that shifts every downstream offset and invalidates the footer.
+Second, those bytes are sealed once written. So to add one populated column, the
+engine reads back every existing column and writes out a whole new set of files.
+
+To be fair to table formats like Iceberg: they make adding a column to the SCHEMA
+cheap — but that column reads back as null. The moment you backfill real values —
+the whole point of feature engineering — you're back to rewriting the data files.
+
+Lance mechanism: a fragment is a group of rows; within it, each column is a separate
+data file. Adding a column appends new data files for just that column and writes a
+new manifest/version; a background compaction step keeps file counts in check, but
+you never manage it.
 -->
 
 ---
@@ -351,11 +506,26 @@ loader = torch.utils.data.DataLoader(perm, batch_size=350, shuffle=True, num_wor
 </style>
 
 <!--
-2-min bridge. The demo uses LANCEDB (not pylance): lancedb + the Permutation API,
-shuffle via the standard DataLoader. The point to land: image bytes + precomputed
-vision features + labels live in ONE table, so a shuffled training batch and a
-full-column scan (for curation/eval) read the same source — no feature store, no
-join by id. Built on the TextVQA notebook. Then pivot to proof. ~2 min.
+When thinking about a new format, the natural worry is: does taking
+advantage of all this mean rewriting all of my training code? The answer is no — you
+simply point your existing PyTorch DataLoader at a Lance table, and that's basically it.
+
+Look at the table at the top. This is a sample from the example we'll build in the
+workshop — TextVQA. In a single row you've got the raw image bytes, the question,
+the answer, and a precomputed vision embedding — all side by side. No separate
+blob store for the image, no feature store for the vector, no joining them back
+together by ID. They're just columns in the same table.
+
+And the code is regular PyTorch. You connect to the table, you wrap it in what we call
+Permutation API in LanceDB — that's the piece that handles shuffling and lets you select only
+the columns that this run needs — and you hand it to a standard torch DataLoader.
+
+Also worth noting here: the same table serves two completely different access
+patterns. Training reads small shuffled batches; but upstream (curation) and downstream (evaluation)
+tend to scan full columns. This is what the storage layout of Lance enables.
+
+This brings us to the question that actually matters for training — when you read
+off this Lance table, does it keep the GPU fed? Let's look at the numbers.
 -->
 
 ---
@@ -393,29 +563,59 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-The money chart. ~2.5 min. Citation is on-slide: github.com/lancedb/training.
+We trained the same Vision
+Transformer on a single H200 GPU, changing only one thing each time: where the data
+comes from and how it's read. The metric is MFU — Model FLOPs Utilization — which
+is just how much of that expensive GPU's compute is actually doing useful work.
+Higher is better; a lower bar means the GPU is sitting idle waiting on data.
 
-WHAT MFU MEANS — Model FLOPs Utilization: the fraction of the GPU's theoretical
-peak compute (FLOPs/sec) the training run actually achieves. The standard way to
-measure how efficiently a run uses the hardware. Higher = less idle silicon.
+Start with the top bar — that's the ceiling. It's a run with no data loading at
+all, data already sitting in GPU memory. And it's still only about 41%. That surprises people, so
+it's worth unpacking: 41% is the realistic ceiling for this synthetic workload, not 100%
+— you never hit a GPU's theoretical peak in practice, because of memory-bandwidth limits,
+non-matmul ops (attention, softmax, normalization).
 
-WHAT "DATA LOADING" IS — everything needed to hand the GPU its next batch:
-reading bytes from storage (disk or S3), DECODING them (e.g. JPEG → pixels),
-transforms/augmentation, collating into a tensor, copying to the GPU. Much of
-this is CPU-bound — decode especially. While the CPU does that work, the GPU waits.
+One thing to be clear about, because it makes this fair: every one of these bars is
+reading from the same S3 bucket — open-source LanceDB reads straight from an s3://
+URI, just like the Parquet and the raw-files runs do. Nobody got a local-disk
+advantage. The only bar not reading from storage is the top one, the in-memory
+ceiling.
 
-WHY THE CEILING IS ONLY ~41% (people will be surprised it's that low) — the top
-bar uses synthetic data already in memory: no reads, no decode. So it isolates
-the model + hardware limit. Even then you can't approach 100%, because peak FLOPs
-is a theoretical number you never hit in practice: memory-bandwidth limits,
-attention / softmax / normalization and other non-matmul ops, kernel-launch and
-communication overhead. ~40% MFU on a big ViT is actually healthy. So 41% is THIS
-workload's realistic ceiling, not 100%.
+Both open-source LanceDB and LanceDB Enterprise sit right up
+against that ceiling, within about 5%. Parquet on S3 is at roughly half of that
+number — about 21%. And raw files pulled from S3 with boto3 into the GPU is down
+around 13%. So loading data from Lance is roughly 2x Parquet and 3x raw files on
+S3, and it gets you within touching distance of a GPU that has nothing to wait for.
 
-THE POINT — every bar below the ceiling is lower ONLY because of the data path:
-the GPU sitting idle waiting on reads + decode. Lance gets within ~5% of the
-ceiling; Parquet and raw S3 via boto fall far short. With a multi-GPU training
-setup and a video training job, these differences become even larger.
+And remember, this is a single GPU on images. Scale to a multi-GPU job, or to video
+where every sample is far heavier to load, and this gap widens — the data path is
+the thing that breaks first. We're going to be releasing more such benchmarks
+on this linked repo, if you're interested.
+
+---
+ADDENDUM — definitions, if asked:
+
+MFU (Model FLOPs Utilization): the fraction of the GPU's theoretical peak compute
+(FLOPs/sec) the run actually achieves. Standard way to measure how efficiently a run
+uses the hardware.
+
+"Data loading" = everything needed to hand the GPU its next batch: reading bytes
+from storage, DECODING them (JPEG → pixels), transforms/augmentation, collating into
+a tensor, copying to the GPU. Much of this is CPU-bound — decode especially — and
+while the CPU does it, the GPU waits.
+
+Why the ceiling is only ~41%: even with data in memory you can't approach 100% — peak
+FLOPs is theoretical. Memory-bandwidth limits, non-matmul ops (attention, softmax,
+normalization), and kernel-launch/communication overhead all eat into it. ~40% MFU on
+a big ViT is healthy.
+
+Setup: ViT-H/14, batch 350, single H200. Code: github.com/lancedb/training.
+
+Read sources (from bench.py, if pressed on fairness): LanceDB OSS reads
+s3://{bucket}/training/; Parquet reads an s3:// .parquet via PyArrow S3FileSystem;
+boto3 reads loose JPEGs from the same bucket. All three hit S3. LanceDB Enterprise
+uses the managed db:// endpoint — object-store-backed, not local disk. Only the
+"Pure GPU" ceiling is in-memory synthetic data.
 -->
 
 ---
@@ -460,18 +660,51 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-The 9.1 samples/sec number is what matters ~2 min.
+That last chart was a synthetic workload on vision transformers.
+This one is a different and a much harder workload — world
+models, which train on long streams of environment frames. The pictures on the left
+are from PushT, one of the environments in the stable-worldmodel benchmark. Same
+question as before: how many samples per second can we feed the model, reading from
+local disk and then from S3.
 
-IF ASKED ABOUT "CACHED" — it's an in-memory cache of specific columns (a
-keys_to_cache arg on the dataset), held in RAM and served from there each step.
-Not OS page cache, not a local download. The point cuts FOR Lance:
-  • HDF5 on S3 NEEDS the cache to be usable: 9.1 → 756 samples/s (still ~4× slower
-    than Lance) — reading HDF5 over object storage is many tiny network reads.
+Look at local disk first, the top group. Lance is at about 4,800 samples a second —
+roughly 3x the alternatives, HDF5 and reading straight from video. So even on local
+disk, Lance is well ahead.
+
+But the row I really to focus on is the bottom one — HDF5 reading from S3,
+uncached: 9.1 samples per second. That's the number you'd hit if
+you naively pointed a legacy HDF5 pipeline at object storage, because HDF5 over S3 turns
+into a storm of tiny network reads. At 9 samples a second, that training job pretty much doesn't run.
+
+The middle bar in the S3 table shows "HDF5 cached" at 756 samples/sec. That's HDF5's best
+case: you hold its columns in RAM and serve from there. It's way faster than the naive
+scan from S3, but you've had to fit the data in memory to get it that quickly, which
+is definitely not cheap as you scale up.
+
+Now compare Lance on the same S3 bucket: it shows 3,100 samples a second, reading straight from
+object storage with no special setup. Basically, Lance is fast enough off of
+S3 (not that much slower than off of local disk) that you don't need to pre-stage anything.
+
+The comparison on the slide is aiming to be generous to HDF5, which was the pre-existing standard
+format in this domain, and this was run by the authors of the stable-worldmodel framework,
+who work in Yann Lecun's research group. Lance's plain, uncached performance is 4x faster than
+cached HDF5, and the whole thing is on disk in just 13 GB.
+
+The takeaway: Lance lets you train directly off object storage, at rapid speed, without elaborate
+staging mechanisms.
+
+---
+ADDENDUM — what "cached" means, if asked:
+
+It's an in-memory cache of specific columns (a keys_to_cache arg on the dataset),
+held in RAM and served from there each step — NOT OS page cache, not a local
+download. The detail cuts FOR Lance:
+  • HDF5 on S3 NEEDS the cache to be usable: 9.1 → 756 samples/s (still ~4x slower
+    than Lance).
   • Lance gains ~nothing from caching: S3 3,184 → 3,253 (flat); local 4,815 → 4,431
-    (slightly slower — the RAM copy is just overhead for an already-efficient reader).
-So Lance reads straight from S3 fast enough that you don't pre-stage data in RAM;
-HDF5 only becomes viable on S3 if you do. The bars show Lance's plain no-cache
-number vs HDF5's best-case cached number.
+    (slightly slower — the RAM copy is pure overhead for an already-efficient reader).
+So Lance is efficient enough that caching doesn't help it; HDF5 is only viable on S3
+if you cache.
 -->
 
 ---
@@ -514,8 +747,33 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-Proves evolution + one-file + indexes (no benchmark number — it's an agility story).
-Speed keeps the GPU fed; evolution + search keep the iteration loop fast. ~2.5 min.
+So far I've been showing you speed — keeping the GPU fed. But speed is only half the
+story. Speed feeds the GPU; data evolution feeds the research loop. This slide is
+about that second half.
+
+This is a real autonomous-driving example — object detection on BDD100K, which is
+dashcam footage dataset across day, night, and rain settings.
+
+It starts with one Lance table: the images, the bounding-box annotations, and
+embeddings all live together — not an image store plus an annotation database plus a
+vector index, just one table, that's governed and versioned within Lance.
+
+Because the embeddings are right there, you can curate by search. Instead of
+eyeballing frames, you ask the table for the slice you care about via vector search — "every
+nighttime-pedestrian frame" — and that becomes your training subset. You can also
+dedupe the same way: here, using Lance's search features flagged about 17% of
+frames as near-duplicates, which was easily done on terabytes of data.
+
+Then you enrich the data. Any derived feature you compute — a difficulty score, a weather
+tag — gets added as a new column, which, remember, is a cheap append, not a full table
+rewrite. So you curate a hard slice, fine-tune on it, and measure. Rinse, repeat and iterate faster.
+
+The numbers on the right show the pay-off. Fine-tuning on these curated slices improves object
+detection accuracy meaningfully on exactly the hard cases that matter for
+safety — detecting nighttime pedestrians is up about 29%, distant pedestrians 22%, riders 20%.
+That's the full training loop: search to find the failure modes, add columns to enrich the data with features,
+version it, retrain. As a researcher or engineer, your focus is on training, not wrangling with
+infrastructure bottlenecks.
 -->
 
 ---
@@ -576,11 +834,29 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-The editions slide (OSS-vs-managed axis — a different question than slide 5's
-architecture). Three columns: Lance the format, LanceDB OSS the library (the
-on-ramp, and what the workshop uses), Enterprise the managed platform that
-separates storage from compute and distributes search/indexing/feature-eng
-(Geneva is one slice). Factual, capability-first — not a pitch. ~1.5 min.
+Before we get hands-on, let me reiterate how this is packaged, because there
+are three names and people tend to get them confused. They're all the same open Lance format
+underneath — the difference is just how much you run by yourself.
+
+On the left is Lance — the format. The open columnar file and table format. Stores the
+data and manages the indexes on any object store or local disk.
+This is the foundation that we build on. Think of Lance as an alternative to Parquet + Iceberg,
+with an open, portable substrate with no vendor lock-in.
+
+In the middle, and highlighted here, is LanceDB open-source — the retrieval library and
+APIs on top of the format. It runs embedded, on your own infrastructure, single
+node. And this is what today's workshop uses. For most workloads short of massive
+scale, this is all you need.
+
+On the right is LanceDB Enterprise — the managed platform on that same format. The
+key difference is that it separates storage from compute, so search, indexing, and
+feature engineering run distributed rather than on one node. You'd reach for it when
+you hit massive scale, terabytes and beyond.
+
+The thing to take away: it's one format, three levels of "run it yourself." You
+start on the open-source library — which is what we're about to do — and the path to
+managed scale doesn't change your data or your format. And you can always leverage all the well-known
+open source compute engines you know and love, like Polars, DuckDB, Spark, and more, on top of Lance.
 -->
 
 ---
@@ -608,9 +884,26 @@ class: flex flex-col justify-center
 </div>
 
 <!--
-Workshop ramp 1/3 — task + why fine-tune, merged. The image carries the Q&A
-examples (twa, domino), so no separate text rows. Two-stage model (image encoder
-→ language model) introduced here for the next (efficiency) slide. ~2 min.
+Okay — that's the why and the what. Now let me set up the actual task we'll work
+on in the hands-on part, so the notebook makes sense when you open it.
+
+The task is called TextVQA — visual question answering, where the answer is text
+written inside the image. Look at the examples: you're not asking "is there a cat" —
+you're asking the model to actually reason over the image. What does the sugar packet
+say? What brand is this? The answer is printed right there in the image, and the
+model has to reason about what's in it, not just recognize objects.
+
+Mechanically, the model works in two stages, and this matters for the next slide.
+First, an image encoder turns the image into a set of vision embeddings — basically, a
+numerical representation of what's in the image. Then a language model takes those
+embeddings plus the question, and writes the answer. Image in, embeddings, then text
+out.
+
+So why fine-tune the model at all? A general base model is broad but shallow on specifics. It
+might see the packet and not pick out the small "Domino" print that tells you the
+brand. Supervised fine-tuning just means showing it many examples of the image, the
+question, and the correct answer — so it gets grounded in answering the kind of questions we
+actually care about in that domain. That's our task: read the dataset via LanceDB, then fine-tune a base model to do it better.
 -->
 
 
@@ -648,11 +941,33 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-Workshop ramp 3/4 — the efficiency trick, no "cache" wording. Be explicit: the
-image-encoder output is WRITTEN AS A COLUMN IN THE LANCE TABLE (on disk/object
-store) and READ BACK from the table each pass. Bridge to the cheap-column-write
-property (slide 7): a new column is an append, not a rewrite — unlike
-Parquet/Iceberg — which is exactly why this is a no-brainer. ~1.5 min.
+This slide is one specific efficiency trick — precomputing the image embeddings.
+(It's separate from QLoRA, which is HOW we fine-tune the language model cheaply —
+that comes up on the next slide. This one is purely about the image encoder.)
+
+Remember the image encoder is the first stage. In this workshop we freeze it — we're
+fine-tuning the language model on top, not the encoder. And here's the key
+observation: if the encoder never changes, then the embeddings it produces for a
+given image never change either. They're identical on epoch one, epoch five, epoch fifty. So
+re-running the encoder on every image every epoch is pure wasted GPU — you're
+recomputing the same numbers over and over.
+
+So instead you compute the embeddings once, up front, and store them. That alone
+roughly doubles your training step speed, and it frees up about 1.3 GB of GPU memory
+because you're no longer holding the encoder on the device during training.
+
+The real question — and this is where Lance comes in — is where you put those
+embeddings. The usual options are both painful. You either re-encode every epoch,
+which wastes the GPU, or you precompute into sidecar files — .npy or HDF5 — that you
+now have to keep aligned with your data by hand. And if you tried to add them as a
+column to Parquet or Iceberg, you'd rewrite the whole table, exactly the write
+amplification problem from earlier.
+
+With Lance you just add the embeddings as a new column on the same table. It's
+written to the table on disk — or object storage — and the dataloader reads it back
+each pass, right alongside the image and the labels. So, no sidecar files, nothing to
+keep in sync. The precompute technique here helps speedup the data loading, and Lance
+makes it painless.
 -->
 
 ---
@@ -686,8 +1001,16 @@ class: flex flex-col justify-center
 </style>
 
 <!--
-Segue 2 of 2. The hands-on runtime loop as 5 steps, plus a nod to walking the
-prep pipeline. Then straight into the close. ~1 min.
+Here's the whole hands-on in five steps, all on one Lance table on free Colab:
+download a curated subset from Hugging Face, explore it in LanceDB, benchmark Lance
+against Parquet, fine-tune with QLoRA — that's 4-bit base weights plus small
+trainable adapters — reading from the precomputed columns, and evaluate before
+versus after.
+
+And we'll also walk the prep pipeline that built the dataset: raw ingest, curate
+the text-dense slice, backfill features, push to the Hub.
+
+That's everything from the talk, in code. Let's get into it.
 -->
 
 ---
@@ -711,7 +1034,9 @@ Let's open the notebook, and take any questions as they come along!
 </div>
 
 <!--
-Close on momentum, not "questions?". Recap in one breath: six-system stack →
-one open format that keeps GPUs fed and lets teams evolve data without rewrites.
-Then open the 5-min Q&A.
+So that's the whole idea in one line: instead of six systems glued together, one
+open format that keeps the GPU fed and lets you evolve data without rewrites — raw
+bytes to trained model.
+
+Let's open the notebook. We can take questions on any specific concepts as we go alongm.
 -->

@@ -41,7 +41,7 @@
 .lance-closing :deep(.links) {
   display: flex; gap: 36px;
   margin-top: 16px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Geist Mono', ui-monospace, monospace;
   font-size: 14px;
   color: var(--fg-muted);
   letter-spacing: 0.02em;
