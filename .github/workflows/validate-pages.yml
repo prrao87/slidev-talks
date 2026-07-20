@@ -1,0 +1,49 @@
+name: Validate configured Slidev decks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/deploy-pages.yml
+      - .github/workflows/validate-pages.yml
+      - pages-decks.json
+      - scripts/build-pages.mjs
+      - package.json
+      - package-lock.json
+      - addon-lancedb/**
+      - talks/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build-configured-decks:
+    name: Build configured decks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build decks from pages-decks.json
+        run: npm run build:pages -- --repo "${{ github.event.repository.name }}"
+
+      - name: Upload static-site preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages-preview-pr-${{ github.event.pull_request.number }}
+          path: .pages-site
+          if-no-files-found: error
+          retention-days: 7
