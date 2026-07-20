@@ -40,10 +40,13 @@ jobs:
       - name: Build decks from pages-decks.json
         run: npm run build:pages -- --repo "${{ github.event.repository.name }}"
 
+      - name: Prepare preview artifact
+        run: mv .pages-site pages-preview
+
       - name: Upload static-site preview
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pages-preview-pr-${{ github.event.pull_request.number }}
-          path: .pages-site
+          path: pages-preview
           if-no-files-found: error
           retention-days: 7
