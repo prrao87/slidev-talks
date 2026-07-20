@@ -33,6 +33,49 @@ function repositoryName() {
   return name
 }
 
+function changedFilesSince(base) {
+  if (!base)
+    return undefined
+
+  if (!/^[0-9a-f]{7,40}$/i.test(base))
+    throw new Error(`Invalid base commit: ${base}`)
+
+  const result = spawnSync('git', ['diff', '--name-only', `${base}...HEAD`], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+  })
+
+  if (result.error)
+    throw result.error
+  if (result.status !== 0)
+    throw new Error(`Could not determine changed files from ${base}.`)
+
+  return result.stdout.split('\n').filter(Boolean)
+}
+
+function isSharedBuildInput(file) {
+  return file === '.github/workflows/deploy-pages.yml'
+    || file === '.github/workflows/validate-pages.yml'
+    || file === 'pages-decks.json'
+    || file === 'scripts/build-pages.mjs'
+    || file === 'package.json'
+    || file === 'package-lock.json'
+    || file === 'addon-lancedb'
+    || file.startsWith('addon-lancedb/')
+}
+
+function decksForChanges(decks, changedFiles) {
+  if (!changedFiles || changedFiles.some(isSharedBuildInput))
+    return decks
+
+  return decks.filter((deck) => {
+    const entry = deck.entry.replace(/^\.\//, '')
+    const directory = path.posix.dirname(entry)
+
+    return changedFiles.some(file => file === entry || file.startsWith(`${directory}/`))
+  })
+}
+
 function validateDecks(decks) {
   if (!Array.isArray(decks) || decks.length === 0)
     throw new Error('pages-decks.json must contain at least one deck.')
@@ -111,12 +154,14 @@ async function main() {
   const repo = repositoryName()
   const config = JSON.parse(await readFile(configPath, 'utf8'))
   validateDecks(config.decks)
+  const changedFiles = changedFilesSince(readArgument('--changed-since'))
+  const decks = decksForChanges(config.decks, changedFiles)
   await access(slidevBinary)
 
   await rm(outputRoot, { recursive: true, force: true })
   await mkdir(outputRoot, { recursive: true })
 
-  for (const deck of config.decks) {
+  for (const deck of decks) {
     const entryPath = path.join(repositoryRoot, deck.entry)
     await access(entryPath)
 
@@ -149,9 +194,9 @@ async function main() {
       throw new Error(`Slidev build failed for ${deck.entry}.`)
   }
 
-  await writeFile(path.join(outputRoot, 'index.html'), landingPage(config.decks))
+  await writeFile(path.join(outputRoot, 'index.html'), landingPage(decks))
   await writeFile(path.join(outputRoot, '.nojekyll'), '')
-  console.log(`\nBuilt ${config.decks.length} deck(s) in ${outputRoot}`)
+  console.log(`\nBuilt ${decks.length} deck(s) in ${outputRoot}`)
 }
 
 main().catch((error) => {
