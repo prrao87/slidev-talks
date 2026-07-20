@@ -165,13 +165,16 @@ async function main() {
     const entryPath = path.join(repositoryRoot, deck.entry)
     await access(entryPath)
 
-    const base = `/${repo}/${deck.slug}/`
+    const publicPath = `/${repo}/${deck.slug}/`
     const output = path.join(outputRoot, deck.slug)
     const args = [
       'build',
       entryPath,
       '--base',
-      base,
+      // Slidev 52.16 prepends an absolute base to router.push() paths in hash mode.
+      // A relative asset base keeps subdirectory hosting safe without duplicating
+      // the deployment path inside the hash route.
+      './',
       '--out',
       output,
       '--router-mode',
@@ -181,7 +184,7 @@ async function main() {
     if (!deck.includeNotes)
       args.push('--without-notes')
 
-    console.log(`\nBuilding ${deck.title} at ${base}`)
+    console.log(`\nBuilding ${deck.title} at ${publicPath}`)
     const result = spawnSync(slidevBinary, args, {
       cwd: repositoryRoot,
       env: process.env,
