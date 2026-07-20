@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "slidev build",
+    "build:pages": "node scripts/build-pages.mjs",
     "dev": "slidev --open",
     "export": "slidev export"
   },

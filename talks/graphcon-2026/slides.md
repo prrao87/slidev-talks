@@ -23,11 +23,7 @@ layout: cover
 Let your agents move between fuzzy associations, graph facts, and multimodal evidence.
 </p>
 
-<Presenter
-  name="Prashanth Rao"
-  role="AI ENGINEER · LANCEDB"
-  avatar="/prashanth.jpg"
-/>
+<GraphConPresenter />
 
 ::hero::
 

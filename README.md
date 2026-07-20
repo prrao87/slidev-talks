@@ -109,6 +109,44 @@ slidev export talks/my-new-talk/slides.md --with-clicks
 slidev export talks/my-new-talk/slides.md --range 1,4-8,12
 ```
 
+## GitHub Pages
+
+GitHub Pages deployment is opt-in per deck. Add a presentation to
+`pages-decks.json` only when it should become a public site:
+
+```json
+{
+  "entry": "talks/my-new-talk/slides.md",
+  "slug": "my-new-talk",
+  "title": "My New Talk",
+  "includeNotes": false
+}
+```
+
+Each configured deck is built under its own route:
+
+```text
+https://<username>.github.io/<repository>/<slug>/
+```
+
+Decks that are not listed remain in the repository but are not deployed. Set
+`includeNotes` to `true` only if the public build should contain speaker notes.
+
+Test all configured sites locally with:
+
+```bash
+npm run build:pages -- --repo slidev-talks
+```
+
+The generated multi-site artifact is written to `.pages-site/`. After changes
+land on `main`, the GitHub Pages workflow rebuilds every configured deck and
+publishes the artifact. The workflow can also be run manually from the Actions
+tab.
+
+Because each deck is hosted below a unique subpath, avoid hard-coded root asset
+URLs such as `/photo.jpg`. Reference images directly from Markdown or import
+them from a Vue component so Slidev and Vite can apply the correct base path.
+
 ## Repo Hygiene
 
 Commit source material needed to rebuild a talk: Markdown slides, theme/addon code, and static source assets. Do not commit dependencies, generated Slidev state, rendered decks, exports, recordings, scratch notes, or local environment files.
