@@ -1,0 +1,10 @@
+{
+  "decks": [
+    {
+      "entry": "talks/graphcon-2026/slides.md",
+      "slug": "graphcon-2026",
+      "title": "Multimodal Knowledge Graphs for Agents",
+      "includeNotes": false
+    }
+  ]
+}

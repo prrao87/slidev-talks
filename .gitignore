@@ -80,3 +80,9 @@ Thumbs.db
 
 # Nested repos accidentally created under talks/
 talks/**/.git/
+
+# local
+.playwright-cli
+
+# generated GitHub Pages artifact
+.pages-site/

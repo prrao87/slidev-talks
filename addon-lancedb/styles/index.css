@@ -11,6 +11,15 @@
   --bg-elev:     #201b16;
   --bg-elev-2:   #2a241e;
   --bg-deep:     #0f0d0b;
+  --lancedb-content-top: 80px;
+
+  /* Slidev code tokens must match the always-dark slide surface even when
+     the player itself is not carrying Slidev's optional html.dark class. */
+  --slidev-code-background: #1b1b1b;
+  --slidev-code-foreground: #eee;
+  --slidev-code-tab-divider: #2a241e;
+  --slidev-code-tab-text-color: #a89a8b;
+  --slidev-code-tab-active-text-color: #f0e7dc;
 
   /* Text */
   --fg:          #f0e7dc;
@@ -56,6 +65,7 @@
    their own content and are unaffected. */
 .slidev-layout.default {
   padding: 128px 96px 72px;
+  padding-top: var(--lancedb-content-top) !important;
 }
 .slidev-layout.default > h1:first-child {
   font-size: 40px;
