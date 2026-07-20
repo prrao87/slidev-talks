@@ -3,15 +3,6 @@ name: Validate configured Slidev decks
 on:
   pull_request:
     branches: [main]
-    paths:
-      - .github/workflows/deploy-pages.yml
-      - .github/workflows/validate-pages.yml
-      - pages-decks.json
-      - scripts/build-pages.mjs
-      - package.json
-      - package-lock.json
-      - addon-lancedb/**
-      - talks/**
 
 permissions:
   contents: read
