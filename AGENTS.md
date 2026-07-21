@@ -1,4 +1,4 @@
-# GraphCon Slidev deck guardrails
+# Slidev presentation guardrails
 
 ## Audience-first writing
 
@@ -8,8 +8,8 @@
   takeaways unless the slide has already taught them. Avoid phrases such as
   "comparable evidence signatures," "distinct vector signatures," and similar
   noun stacks that sound precise but require the audience to invent a meaning.
-- Prefer familiar nouns already visible on the slide—such as node, relationship,
-  feature, vector, query, and direction—and connect them with a concrete verb.
+- Prefer familiar nouns already visible on the slide, such as node, relationship,
+  feature, vector, query, and direction. Connect them with a concrete verb.
 - Prefer the field's standard operation name when a colloquial substitute is
   overloaded for an ML audience. Define the standard term plainly instead of
   inventing a near-synonym; for example, say "permute" and "fixed coordinate
@@ -32,6 +32,12 @@
   shorthand, or a research-paper abstraction, rewrite them as a direct sentence.
 - Parallel wording across slides is useful only when both lines remain natural;
   never sacrifice clarity to make two slides grammatically symmetrical.
+- Use em dashes sparingly. Prefer a period, comma, colon, semicolon, or
+  parentheses when that punctuation expresses the sentence structure more
+  directly. Keep an em dash only when its spoken pause materially improves the
+  line or when it is part of intentional visual notation, such as a graph edge.
+- During a full-deck writing pass, audit both visible copy and speaker notes.
+  Read revised lines aloud to preserve a natural, semi-formal speaking tone.
 
 ## Layout and spacing QA
 
@@ -39,14 +45,14 @@
   reproduction target for the issue being discussed.
 - Do not declare a spacing or overlap issue fixed from source inspection or a
   single glance at a differently sized render.
-- For adjacent blocks, verify the visible painted boxes—not only their parent
+- For adjacent blocks, verify the visible painted boxes, not only their parent
   line boxes. Inline `code`, math, borders, backgrounds, shadows, and transforms
   can paint outside the space that appears correct in CSS.
 - Prefer structural separation: a dedicated layout row with explicit padding,
   controlled line-height, and controlled element padding/background. Do not rely
   on repeatedly increasing `margin-top` when painted content can escape its box.
 - After each spacing fix:
-  1. Build with `npm run build -- talks/graphcon-2026/slides.md`.
+  1. Build the affected deck with `npm run build -- talks/<deck>/slides.md`.
   2. Render the affected slide at the user's viewport size when known; otherwise
      test both the normal presentation viewport and a shorter viewport.
   3. Inspect the full-resolution render. When browser inspection is available,

@@ -1065,7 +1065,7 @@ class: hdc-overview-slide
       <p><b>often 10,000 values</b><br/>working together as one representation</p>
     </div>
     <ul class="hdc-simple-steps">
-      <li><b>Encode.</b> Give each concept—<code>Person</code>, <code>Seattle</code>, <code>VISITED</code>—its own long, reproducible hypervector.</li>
+      <li><b>Encode.</b> Give each concept, such as <code>Person</code>, <code>Seattle</code>, or <code>VISITED</code>, its own long, reproducible hypervector.</li>
       <li><b>Compose.</b> Use simple algebraic operations to combine them, producing new hypervectors that can represent a fact or a set of facts.</li>
       <li><b>Retrieve.</b> Compare hypervectors by similarity. The closest ones point toward related concepts and the most relevant candidate answers.</li>
     </ul>
@@ -1209,10 +1209,10 @@ Next: show why 10,000 dimensions make accidental similarity so unlikely.
 Likely audience question: why not caption/OCR the images and search text embeddings?
 - Honest answer: for ordinary semantic image search, embeddings may be cheaper and better.
 - HDC does not replace perception; production features should come automatically from
-  VLMs, OCR, detectors, metadata, or existing embedding pipelines—not manual labeling.
+  VLMs, OCR, detectors, metadata, or existing embedding pipelines rather than manual labeling.
 - The codebook scales with unique features |V|, not dataset rows n; many records reuse
   the same feature vectors. Record-vector storage still scales with n. This demo persists
-  completed vectors as float16—20 KB rather than 40 KB per 10,000-D vector—while keeping
+  completed vectors as float16: 20 KB rather than 40 KB per 10,000-D vector, while keeping
   TorchHD computation in float32.
 - At scale, derive each feature vector independently from seed + token hash so adding a
   feature does not rebuild the codebook or invalidate existing vectors.
@@ -1539,7 +1539,7 @@ class: feature-query-slide
 
 <div class="operation-content">
   <Eyebrow>Why binding and bundling belong together</Eyebrow>
-  <h1>Can a query find Seattle — without naming it?</h1>
+  <h1>Can a query find Seattle without naming it?</h1>
   <div class="query-construction" aria-label="Constructing the HDC query from natural language">
     <div class="query-language">
       <small>USER QUERY</small>
@@ -1584,9 +1584,9 @@ class: feature-query-slide
 Speaker notes:
 - The visible query deliberately repeats the phrase from the opening: “Cities on the Pacific coast with mountains nearby.”
 - Query construction happens before HDC. The demo's hand-written rule maps this phrase to four vocabulary-aligned strings: `pacific_coast`, `mountains`, `nature_access`, and `waterfront`.
-- The rule-based extractor is intentionally replaceable. A small local LLM could perform the same constrained task—return a short list of normalized feature strings—without generating the answer or traversing the graph.
+- The rule-based extractor is intentionally replaceable. A small local LLM could perform the same constrained task: return a short list of normalized feature strings without generating the answer or traversing the graph.
 - A query must use the same codebook and the same two-layer binding convention as the stored node vector: value to feature role, then feature association to Location type.
-- Two of the four query associations—`feature -> mountains` and `feature -> pacific_coast`—are shown here for legibility. The query does not contain Seattle or any other location identity.
+- For legibility, only two of the four query associations are shown here: `feature -> mountains` and `feature -> pacific_coast`. The query does not contain Seattle or any other location identity.
 - The visible query contains the generic `Location` type and the requested features, but never the identity `Seattle`; the matching table row supplies that identity after retrieval.
 - An implementation must apply the same `T_Location` factor to stored `vibe_hv` vectors and query vectors. The common bipolar factor preserves relative cosine similarity.
 - LanceDB ranks stored `Location.vibe_hv` vectors by cosine similarity, reported as `score = 1 - cosine_distance`; it does not test whether every requested feature is present.
@@ -1659,7 +1659,7 @@ Speaker notes:
 - `encode_triple` calls `normalize_for_binding` on the composite subject and object only at this boundary, then binds S*, P, and O* into `VISITED.hv`.
 - This distinction is visible in the rebuilt LanceDB tables: node rows contain full-precision bundles (for example Location.hv spans −10…10), while VISITED.hv contains only −1/+1.
 - Bipolar factors preserve MAP's self-inverse binding: known subject and predicate factors recover the stored object factor exactly.
-- MAP binding is commutative, so the relationship row's `person_id` and `location_id` columns—not the bound vector alone—preserve edge direction.
+- MAP binding is commutative, so the relationship row's `person_id` and `location_id` columns preserve edge direction; the bound vector alone does not.
 - `Location.vibe_hv`, used in the later retrieval slides, is the separate bundled vector for fuzzy multimodal evidence.
 -->
 
@@ -1721,7 +1721,7 @@ Speaker notes:
 - Permutation is the third common HDC operation, alongside bundling and binding.
 - In the HDC/VSA literature, a fixed permutation is a bijective coordinate reordering. A nonzero power usually makes an event vector nearly orthogonal to its unpermuted form, while the inverse permutation recovers that event vector exactly.
 - This example reuses the core VISITED relationship, now applied to several ordered visits by one person to explain sequence.
-- Binding first creates two fact hypervectors: F1 encodes Maya — VISITED → Space Needle; F2 encodes Maya — VISITED → Pike Place Market.
+- Binding first creates two fact hypervectors: F1 encodes Maya visiting the Space Needle; F2 encodes Maya visiting Pike Place Market.
 - Bundling alone is commutative: F1 ⊕ F2 = F2 ⊕ F1. It remembers that both visits occurred but cannot answer which one came first.
 - A permutation is a fixed, reversible coordinate reordering. The encoder defines ρ⁰ as visit position 1 and ρ¹ as visit position 2. The operation itself is not a clock; the positional convention gives it temporal meaning here.
 - The ordered episode is H = ρ⁰(F1) ⊕ ρ¹(F2). Reversing the visits assigns the coordinate arrangements to different facts, producing H_reverse = ρ⁰(F2) ⊕ ρ¹(F1), a different hypervector.
@@ -1791,7 +1791,7 @@ class: lance-stack-slide
 
 <!--
 Speaker notes:
-- This is the architectural center of the demo: one `person-location/` directory contains three Lance datasets—Person, Location, and VISITED.
+- This is the architectural center of the demo: one `person-location/` directory contains three Lance datasets: Person, Location, and VISITED.
 - Lance is the shared columnar table/file format. It provides versioned datasets, schema evolution, and fast scans/random access for scalar, vector, and multimodal columns.
 - LanceDB is the data-management and vector-search interface: `graph_ingest.py` creates tables from Polars, `hdc_encode.py` adds fixed-size vector columns, and `hdc_retrieve.py` runs cosine search over `Location.vibe_hv`.
 - The precision boundary is deliberate: TorchHD performs encoding and algebra in float32; completed vectors are downcast once and persisted in Lance as fixed-size float16 lists. A stored vector is explicitly upcast before it re-enters TorchHD.
@@ -1997,7 +1997,7 @@ class: architecture-slide
       <div class="format-note" style="display:none"><span>Lance format layer</span><b>fixed-size float16 vector columns</b></div>
     </div>
   </div>
-  <div class="architecture-boundary" style="display:none"><b>Boundary:</b><span>LanceDB is the implementation used here—not a prerequisite for HDC as a concept.</span></div>
+  <div class="architecture-boundary" style="display:none"><b>Boundary:</b><span>LanceDB is the implementation used here, but it is not a prerequisite for HDC as a concept.</span></div>
   <p class="architecture-takeaway">Hypervectors complement, not replace, graphs. <strong>Both are views that operate over the same data.</strong></p>
 </div>
 
