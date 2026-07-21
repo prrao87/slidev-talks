@@ -1197,27 +1197,39 @@ class: hypervector-slide
 </div>
 
 <!--
-The important turn: unlike a learned text embedding, the atomic HDC vector is a
-lookup from a codebook. We build that codebook by enumerating the unique features
-extracted from the data, then assigning each feature a seeded random row. A model
-may help extract "mountains" from an image, but it does not predict the mountains
-hypervector. We create meaning by reusing those rows inside composite records.
-If two four-part bundles share three approximately orthogonal parts, their expected
-cosine is about 3 / sqrt(4*4) = 0.75. The seed only makes the codebook reproducible.
-Next: show why 10,000 dimensions make accidental similarity so unlikely.
+So here’s the simplest answer to the question we ended with: where do those
+initial hypervectors come from?
 
-Likely audience question: why not caption/OCR the images and search text embeddings?
-- Honest answer: for ordinary semantic image search, embeddings may be cheaper and better.
-- HDC does not replace perception; production features should come automatically from
-  VLMs, OCR, detectors, metadata, or existing embedding pipelines rather than manual labeling.
-- The codebook scales with unique features |V|, not dataset rows n; many records reuse
-  the same feature vectors. Record-vector storage still scales with n. This demo persists
-  completed vectors as float16: 20 KB rather than 40 KB per 10,000-D vector, while keeping
-  TorchHD computation in float32.
-- At scale, derive each feature vector independently from seed + token hash so adding a
-  feature does not rebuild the codebook or invalidate existing vectors.
-- Strongest framing: learned models extract semantics, HDC composes explicit evidence,
-  and the graph validates candidates. Benchmark embedding-only, HDC, and hybrid systems.
+At setup time, our code walks through the Person, Location, and VISITED data and
+the extracted image features to build a vocabulary. It creates tokens for roles
+like “feature,” values like “mountains,” and relationships like “VISITED.” This
+vocabulary is predecided for encoding, but it doesn’t have to be written by hand.
+A vision model, metadata pipeline, or small language model can supply the terms.
+Predecided just means every allowed term has a stable entry we can look up.
+
+The code sorts those tokens into the matrix shown on the left: one row per token,
+ten thousand columns per row, and only plus-one or minus-one values. A dictionary
+maps each token to its row number, so “mountains” becomes a table lookup.
+
+The rows are random only at initialization. A fixed vocabulary and seed recreate
+the same matrix. We save that vocabulary and load it again at query time, so
+ingestion and retrieval agree on every row. In ten thousand dimensions,
+independently generated rows are almost orthogonal, giving distinct symbols
+distinct starting directions.
+
+Now look at the right side. To encode Seattle, we don’t generate a new atomic
+vector. We look up mountains, waterfront, Pacific coast, and skyline, then bundle
+their rows. Another coastal city can reuse the first three and replace skyline
+with harbor. Because both records reuse the exact same ingredients, their bundles
+remain similar. Sharing three of four approximately orthogonal ingredients gives
+an expected cosine similarity of about 0.75 in this simplified example.
+
+The random row for “mountains” doesn’t understand mountains by itself. Meaning
+comes from consistently reusing and composing these symbols. And a codebook is
+by no means the only way to encode data into hypervectors. It’s simply an easy
+place to begin with a discrete vocabulary because every step is visible. More
+advanced encoders can handle continuous values, sequences, structured inputs,
+or learned features. Those are directions we’ll explore in the future.
 -->
 
 <style>
