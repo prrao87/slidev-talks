@@ -39,6 +39,19 @@
 - During a full-deck writing pass, audit both visible copy and speaker notes.
   Read revised lines aloud to preserve a natural, semi-formal speaking tone.
 
+## Speaker notes
+
+- Write Slidev speaker notes as one HTML comment block: `<!-- ... -->`.
+- Place that comment after all visible slide markup and the slide's `<style>`
+  block, immediately before the next `---` slide separator. Do not place speaker
+  notes in the frontmatter header or before content that still belongs to the
+  current slide.
+- Put only words the presenter will actually say in the notes. Do not add stage
+  directions, timing cues, presenter reminders, or backtick-formatted code.
+- After editing notes, run a notes-enabled local build and verify the affected
+  slide in Slidev's presenter view. Do not infer correct note placement from a
+  successful build alone.
+
 ## Layout and spacing QA
 
 - Treat a user-provided screenshot and its viewport dimensions as the canonical
