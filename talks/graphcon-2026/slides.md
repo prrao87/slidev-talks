@@ -38,7 +38,186 @@ Hi, and welcome to the world of multimodal knowledge graphs! Quick show of hands
 
 And how many of you deal with multimodal data (images, video, audio, sensor traces, or anything that's not standard tabular data)?
 
-Nice. Hopefully this talk is interesting. I'm Prashanth, I work as an AI Engineer at LanceDB. And this talk serves as a sequel to David Hughes' excellent talk from this morning. It blends the worlds of property graphs, which no doubt, lots of us here are familiar with, and hyperdimensional computing, which David talked about in the morning. Let's get started!
+Nice. Hopefully this talk is interesting. I'm Prashanth, I work as an AI Engineer at LanceDB. And this talk serves as a sequel to David Hughes' excellent talk from this morning. It blends the worlds of property graphs, which no doubt, lots of us here are familiar with, and hyperdimensional computing, which David talked about in the morning. It's intended to be educational, and not introducing the concepts that come together, so hopefully you all find this useful.
+-->
+
+---
+layout: default
+class: city-choice-slide
+---
+
+<div class="city-choice-content">
+  <Eyebrow>A fuzzy question</Eyebrow>
+  <h1>Which city fits this query?</h1>
+  <p class="city-query"><em>"Cities on the Pacific coast with mountains nearby.”</em></p>
+  <div class="city-image-grid">
+    <div class="city-image-card">
+      <img src="./assets/seattle.jpg" alt="Seattle skyline and Mount Rainier" />
+      <span class="candidate-label">CANDIDATE 01</span>
+      <span class="city-helper">Seattle, WA</span>
+    </div>
+    <div class="city-image-card">
+      <img src="./assets/salt-lake-city.jpg" alt="Salt Lake City skyline and mountains" />
+      <span class="candidate-label">CANDIDATE 02</span>
+      <span class="city-helper">Salt Lake City, UT</span>
+    </div>
+    <div class="city-image-card">
+      <img src="./assets/nyc.jpg" alt="New York City skyline" />
+      <span class="candidate-label">CANDIDATE 03</span>
+      <span class="city-helper">New York City, NY</span>
+    </div>
+  </div>
+  <div v-click class="city-reveal-grid">
+    <div class="city-reveal">
+      <div class="feature-chips"><span>mountains</span><span>waterfront</span><span>pacific coast</span></div>
+    </div>
+    <div class="city-reveal">
+      <div class="feature-chips"><span>mountains</span><span>nature access</span><span>inland</span></div>
+    </div>
+    <div class="city-reveal">
+      <div class="feature-chips"><span>dense skyline</span><span>riverfront</span><span>urban energy</span></div>
+    </div>
+  </div>
+  <p class="city-prompt">What evidence did your mind combine before you chose?</p>
+</div>
+
+<style>
+.slidev-layout.city-choice-slide {
+  padding: 88px 84px 46px;
+}
+
+.city-choice-content h1 {
+  margin: 10px 0 5px;
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.city-query {
+  margin: 0;
+  color: rgba(240, 231, 220, 0.86);
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.city-image-grid,
+.city-reveal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.city-image-grid {
+  height: 236px;
+  margin-top: 20px;
+}
+
+.city-image-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--bg-deep);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.city-image-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 13, 11, 0.05), rgba(15, 13, 11, 0.30));
+  pointer-events: none;
+}
+
+.city-image-card img {
+  width: 100%;
+  height: calc(100% - 34px);
+  object-fit: cover;
+  filter: saturate(0.82) contrast(1.04);
+}
+
+.city-helper {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  border-top: 1px solid var(--border);
+  background: rgba(15, 13, 11, 0.96);
+  color: rgba(240, 231, 220, 0.88);
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+.candidate-label {
+  position: absolute;
+  z-index: 2;
+  top: 13px;
+  left: 14px;
+  border: 1px solid rgba(255, 115, 74, 0.30);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(15, 13, 11, 0.78);
+  color: var(--accent-soft);
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.13em;
+}
+
+.city-reveal-grid {
+  margin-top: 10px;
+}
+
+.city-reveal {
+  min-height: 50px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 8px 12px;
+  background: rgba(32, 27, 22, 0.70);
+}
+
+.feature-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 0;
+}
+
+.feature-chips span {
+  border-radius: 999px;
+  padding: 3px 7px;
+  background: rgba(255, 115, 74, 0.09);
+  color: rgba(240, 231, 220, 0.72);
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 14px;
+}
+
+.city-prompt {
+  margin: 16px 0 0;
+  color: rgba(240, 231, 220, 0.96);
+  font-size: 24px;
+  font-weight: 550;
+  text-align: center;
+}
+</style>
+
+<!--
+Let's start with a quick question. We have three cities: Seattle, Salt Lake City, and New York. Which one fits “Cities on the Pacific coast with mountains nearby?”
+
+It shouldn't take more than a second to choose between these three options.
+
+Hopefully, most of us chose Seattle. But notice what happened before you answered. Your mind combined multiple kinds of evidence. You probably didn't match one exact phrase against one stored field. We know Seattle has mountains nearby, a waterfront, and a Pacific coast location. Even if we didn't have every fact memorized, some of that evidence is visible in the image. Those signals reinforce one another.
+
+Salt Lake City is an interesting candidate because it isn't random noise. It strongly matches mountains and access to nature, but it is inland. New York has a dense skyline and plenty of waterfront, but it does not fit the Pacific-and-mountains combination. So there are degrees of association here.
+
+This distinction will matter later. We expect Seattle to rank highest, but we also want our representation to preserve why Salt Lake City is a plausible partial match.
+
+What your mind just did was combine several individually weak but compatible signals. We haven't thought in terms of graphs, or databases, but rather, combining these connected facts in some intangible way in our minds. That is the pattern we want to reproduce for agents.
 -->
 
 ---
@@ -404,199 +583,13 @@ class: association-slide
 </style>
 
 <!--
-Before we talk about graphs, vectors, or HDC, I want to start with something we, as humans, do almost automatically: we associate.
+That subconscious thought process demonstrates something humans do intuitively: we associate rather than search for an exact match.
 
-Say I ask you the question "which persons visited cities on the pacific coast with mountains nearby?". To answer this, your mind begins joining those pieces together. You don't approach it like a database, in terms of schemas.
+Now let's extend the question: “Which persons visited cities on the Pacific coast with mountains nearby?” The city choice is still fuzzy, but we have added one factual graph relationship: a person VISITED a location.
 
-You use partial signals from an image, likely a memory of the place, and the language in the query, and you form a useful assoiation between all the connected entities.
+Again, our minds construct an image of a location that's a city, bringing to mind the image of a skyline, which is a characteristic feature of a city. We also think of the notion of geography - The Pacific ocean is on the west coast, and not all cities there have mountains. Before the word "Seattle" comes to mind, these associations are all taking place beforehand.
 
-So let's keep this example in mind: “Persons who visited cities on the Pacific coast
-with mountains nearby.” It sounds simple, but it's a query that combines
-visual evidence, geographic meaning, and one factual graph relationship.
--->
-
----
-layout: default
-class: city-choice-slide
----
-
-<div class="city-choice-content">
-  <Eyebrow>A fuzzy question</Eyebrow>
-  <h1>Which city fits this query?</h1>
-  <p class="city-query"><em>"Cities on the Pacific coast with mountains nearby.”</em></p>
-  <div class="city-image-grid">
-    <div class="city-image-card">
-      <img src="./assets/seattle.jpg" alt="Seattle skyline and Mount Rainier" />
-      <span class="candidate-label">CANDIDATE 01</span>
-      <span class="city-helper">Seattle, WA</span>
-    </div>
-    <div class="city-image-card">
-      <img src="./assets/salt-lake-city.jpg" alt="Salt Lake City skyline and mountains" />
-      <span class="candidate-label">CANDIDATE 02</span>
-      <span class="city-helper">Salt Lake City, UT</span>
-    </div>
-    <div class="city-image-card">
-      <img src="./assets/nyc.jpg" alt="New York City skyline" />
-      <span class="candidate-label">CANDIDATE 03</span>
-      <span class="city-helper">New York City, NY</span>
-    </div>
-  </div>
-  <div v-click class="city-reveal-grid">
-    <div class="city-reveal">
-      <div class="feature-chips"><span>mountains</span><span>waterfront</span><span>pacific coast</span></div>
-    </div>
-    <div class="city-reveal">
-      <div class="feature-chips"><span>mountains</span><span>nature access</span><span>inland</span></div>
-    </div>
-    <div class="city-reveal">
-      <div class="feature-chips"><span>dense skyline</span><span>riverfront</span><span>urban energy</span></div>
-    </div>
-  </div>
-  <p class="city-prompt">What evidence did your mind combine before you chose?</p>
-</div>
-
-<style>
-.slidev-layout.city-choice-slide {
-  padding: 88px 84px 46px;
-}
-
-.city-choice-content h1 {
-  margin: 10px 0 5px;
-  font-size: 40px;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
-}
-
-.city-query {
-  margin: 0;
-  color: rgba(240, 231, 220, 0.86);
-  font-size: 19px;
-  line-height: 1.4;
-}
-
-.city-image-grid,
-.city-reveal-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.city-image-grid {
-  height: 236px;
-  margin-top: 20px;
-}
-
-.city-image-card {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border-strong);
-  border-radius: 14px;
-  background: var(--bg-deep);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
-}
-
-.city-image-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(15, 13, 11, 0.05), rgba(15, 13, 11, 0.30));
-  pointer-events: none;
-}
-
-.city-image-card img {
-  width: 100%;
-  height: calc(100% - 34px);
-  object-fit: cover;
-  filter: saturate(0.82) contrast(1.04);
-}
-
-.city-helper {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  height: 34px;
-  padding: 0 13px;
-  border-top: 1px solid var(--border);
-  background: rgba(15, 13, 11, 0.96);
-  color: rgba(240, 231, 220, 0.88);
-  font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 16px;
-  letter-spacing: 0.04em;
-}
-
-.candidate-label {
-  position: absolute;
-  z-index: 2;
-  top: 13px;
-  left: 14px;
-  border: 1px solid rgba(255, 115, 74, 0.30);
-  border-radius: 999px;
-  padding: 5px 9px;
-  background: rgba(15, 13, 11, 0.78);
-  color: var(--accent-soft);
-  font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.13em;
-}
-
-.city-reveal-grid {
-  margin-top: 10px;
-}
-
-.city-reveal {
-  min-height: 50px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 8px 12px;
-  background: rgba(32, 27, 22, 0.70);
-}
-
-.feature-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 0;
-}
-
-.feature-chips span {
-  border-radius: 999px;
-  padding: 3px 7px;
-  background: rgba(255, 115, 74, 0.09);
-  color: rgba(240, 231, 220, 0.72);
-  font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 14px;
-}
-
-.city-prompt {
-  margin: 16px 0 0;
-  color: rgba(240, 231, 220, 0.96);
-  font-size: 24px;
-  font-weight: 550;
-  text-align: center;
-}
-</style>
-
-<!--
-Let's extend that a bit more: We have three cities, Seattle, Salt Lake City, and New York. We're looking to retrieve on the following: “Cities on the Pacific coast with mountains nearby.”
-
-It shouldn't take more than a second to come up with the answer, between these three options.
-
-Hopefully, most of us chose Seattle. But notice what happened in your head before
-you answered. Your mind combined multiple kinds of evidence. You probably didn't match one exact phrase against one stored
-field. We intuitively know that Seattle has mountains nearby, it has a waterfront, and it is on the Pacific coast. Even if we didn't have those facts memorized, we can observe that from the image evidence. Eac of these signals reinforce, or compliment one another.
-
-In this example, Salt Lake City is an interesting addition, because it't not random noise. It does strongly matches mountains and access to nature, but it is inland. New York has a dense
-skyline and plenty of waterfront, but it does not fit the Pacific-and-mountains combination. So there are degrees of association here.
-
-This distinction will matter later. If we had a dataset of these three cities, we fully expect Seattle to rank highly, but we'd also want the representation we stored, to preserve why Salt Lake City is a plausible partial match.
-
-We looked at this from a human perspective, but nowadays, it's agents doing this kind of search and retrieval for us on a daily basis. Just like humans, it can be very powerful if we enable agents to construct the answer from several individually weak but compatible signals.
-
-Next, let's look at the small graph and multimodal dataset we will use to reproduce that behavior and introduce the idea of associative search.
+This is the essence of associative search: rather than directly looking for a city that fits the description, the concepts can connect together in a way that that city, and to the people who visited it. The natural way to think about this kind of data is a graph.
 -->
 
 ---
@@ -638,32 +631,39 @@ class: dataset-schema-slide
           <marker id="ghost-schema-arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L0,8 L9,4 z" fill="#81766d"/></marker>
         </defs>
         <g class="ghost-schema">
-          <path d="M145 143 C195 106 242 86 275 80" marker-end="url(#ghost-schema-arrow)"/>
-          <path d="M490 213 C524 226 541 240 552 251" marker-end="url(#ghost-schema-arrow)"/>
-          <text x="218" y="96">WORKS_AT</text>
-          <text x="531" y="224">LOCATED_IN</text>
-          <g transform="translate(275 23)">
-            <circle cx="55" cy="55" r="55"/>
-            <text x="55" y="60" class="node-type">Company</text>
+          <path d="M145 155 C188 126 233 106 277 92" marker-end="url(#ghost-schema-arrow)"/>
+          <path d="M480 190 C514 198 536 217 553 239" marker-end="url(#ghost-schema-arrow)"/>
+          <g class="ghost-edge-label">
+            <rect x="187" y="113" width="74" height="22" rx="6" class="ghost-edge-chip"/>
+            <text x="224" y="128" class="ghost-edge-text">WORKS_AT</text>
           </g>
-          <g transform="translate(548 205)">
-            <circle cx="55" cy="55" r="55"/>
-            <text x="55" y="60" class="node-type">Country</text>
+          <g class="ghost-edge-label">
+            <rect x="495" y="203" width="84" height="22" rx="6" class="ghost-edge-chip"/>
+            <text x="537" y="218" class="ghost-edge-text">LOCATED_IN</text>
+          </g>
+          <g transform="translate(267 17)">
+            <circle cx="48" cy="48" r="48"/>
+            <text x="48" y="53" class="node-type">Company</text>
+          </g>
+          <g transform="translate(542 222)">
+            <circle cx="48" cy="48" r="48"/>
+            <text x="48" y="53" class="node-type">Country</text>
           </g>
         </g>
         <g class="active-schema">
-          <path d="M170 190 C240 190 312 190 385 190" marker-end="url(#active-schema-arrow)"/>
-          <rect x="214" y="165" width="128" height="31" rx="7" class="edge-chip"/>
-          <text x="278" y="185" class="edge-text">VISITED</text>
-          <text x="278" y="217" class="edge-helper">conceptually: has visited</text>
-          <g transform="translate(33 130)">
-            <circle cx="82" cy="60" r="55"/>
-            <text x="82" y="67" class="active-type">Person</text>
+          <path d="M160 190 H215"/>
+          <path d="M325 190 H380" marker-end="url(#active-schema-arrow)"/>
+          <rect x="215" y="176.5" width="110" height="27" rx="6" class="edge-chip"/>
+          <text x="270" y="193.5" class="edge-text">VISITED</text>
+          <text x="270" y="220" class="edge-helper">conceptually: has visited</text>
+          <g transform="translate(30 130)">
+            <circle cx="80" cy="60" r="50"/>
+            <text x="80" y="67" class="active-type">Person</text>
           </g>
-          <g transform="translate(358 130)">
-            <circle cx="82" cy="60" r="55"/>
-            <text x="82" y="58" class="active-type">Location</text>
-            <text x="82" y="80" class="active-subtype">(city)</text>
+          <g transform="translate(350 130)">
+            <circle cx="80" cy="60" r="50"/>
+            <text x="80" y="58" class="active-type">Location</text>
+            <text x="80" y="80" class="active-subtype">(city)</text>
           </g>
         </g>
         <g class="schema-legend" transform="translate(42 328)">
@@ -716,15 +716,16 @@ class: dataset-schema-slide
 .schema-card svg{display:block;width:100%;height:343px}
 .ghost-schema path{fill:none;stroke:#81766d;stroke-width:1.7;stroke-dasharray:6 6;opacity:.42}
 .ghost-schema circle{fill:rgba(129,118,109,.055);stroke:#81766d;stroke-width:1.5;stroke-dasharray:5 5;opacity:.52}
-.ghost-schema>text{fill:#81766d;font:12px 'Geist Mono',ui-monospace,monospace;text-anchor:middle;opacity:.58}
+.ghost-edge-chip{fill:rgba(15,13,11,.92);stroke:#81766d;stroke-width:1;opacity:.82}
+.ghost-edge-text{fill:#9a8f86;font:9.5px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .node-type{fill:rgba(240,231,220,.48);font:600 14px 'Geist',sans-serif;text-anchor:middle}
 .node-state{fill:#81766d;font:11px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .active-schema>path{fill:none;stroke:#ff734a;stroke-width:3}
 .active-schema circle{fill:rgba(255,115,74,.08);stroke:#ff8b68;stroke-width:2}
-.edge-chip{fill:#241914;stroke:rgba(255,115,74,.52)}
-.edge-text{fill:#ff9e80;font:700 12px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
+.edge-chip{fill:transparent;stroke:rgba(255,115,74,.68);stroke-width:1.2}
+.edge-text{fill:#ff9e80;font:700 10.5px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .edge-helper{fill:rgba(240,231,220,.58);font:12px 'Geist',sans-serif;text-anchor:middle}
-.active-type{fill:#f0e7dc;font:700 21px 'Geist',sans-serif;text-anchor:middle}
+.active-type{fill:#f0e7dc;font:700 17.5px 'Geist',sans-serif;text-anchor:middle}
 .active-subtype{fill:#ff9e80;font:13px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .active-samples{fill:rgba(240,231,220,.68);font:11px 'Geist',sans-serif;text-anchor:middle}
 .schema-legend text{fill:rgba(240,231,220,.58);font:12px 'Geist',sans-serif}
@@ -735,18 +736,13 @@ class: dataset-schema-slide
 </style>
 
 <!--
-The data we're looking at is deliberately small, mainly because the focus is on the methodology. We have four persons, three city locations, and four
-recorded visits of those persons to those locations. Maya and Robby visited Seattle, Elena visited Salt Lake City, and Andre visited New York. Keeping the graph this small means we can trace every transformation without hiding the important ideas behind the complexity.
+Let's construct a small graph dataset that answers this kind of question. We have four persons, three city locations, and four recorded visits of those persons to those locations. Maya and Robby visited Seattle, Elena visited Salt Lake City, and Andre visited New York.
 
 The property graph on the right should look quite familiar:
 a Person connected to a Location by a Visited relationship. The gray Company
-and Country nodes are there just to show how this is how such a subgraph could sit inside a larger, more realistic property graph. We won’t need them for this example, so we'll just focus on the person -> visited -> Location relationship.
+and Country nodes are there just to show how this is how such a subgraph could sit inside a larger, more realistic property graph. We won’t actually model them in this example, so we'll just focus on the person -> visited -> Location relationship for the rest of this talk.
 
-The multimodal aspect of this dataset is in the Location data. Each city has the usual structured fields, but it also carries an image and a natural-language description, which we'll look at more in the upcoming slides.
-So the visual evidence is part of the same location entity that's in the graph.
-
-This gives us a useful separation. The Visited relationship records a fact:
-Person visited a Location. The image and other metadata contain additional features of what a location is like: for example, Seattle comes with a coastline, mountains, waterfront, and so on.
+The multimodal aspect of this dataset is in the Location data. Each city has the usual structured fields, but it also carries an image of the skyline and a natural-language description, which we'll look at more in the upcoming slides. So the visual evidence is part of the same location entity that's in the graph.
 
 The next question is whether storing this kind of data can help answer the fuzzy query we just asked.
 -->
@@ -955,20 +951,14 @@ class: schema-gap-slide
 </style>
 
 <!--
-Let’s try to answer the question using the graph alone.
+There's a fundamental problem in knowledge graphs: the open world assumption. Data that exists in the real world is always missing from the graph. Just because the graph doesn't capture it, it doesn't mean that the data doesn't exist - we just don't know it yet.
 
-Every knowledge graph suffers from the open world problem. The graph can only capture facts that the human designer chose to model. And a graph is never, really, "complete". There's always stuff missing.
+The Cypher query on the right shows how we start with a Person, follow
+a Visited relationship, match on features, and arrive at a Location. The traversal isn’t the problem. In this case, the designer of the graph never decided to store the features "pacific coast" or "mountains". So if these aren't explicitly named, we don't get a match. A MATCH query in Cypher is :all or nothing", especially if you have filters involved.
 
-The Cypher query on the right shows how we can start with a Person, follow
-a Visited relationship, match on features, and arrive at a Location. The traversal isn’t the problem. In this case, nobody decided to store the features "pacific coase" or "mountains"  when the graph was designed. So if Seattle isn't named, we don't get a match.
+We could, of course, keep adding more and more features as properties every time a new question appears. But that becomes brittle and hard to manage very quickly, especially when the evidence is already sitting in images or other places, and users can directly query those sources in many different ways.
 
-We could keep adding more properties every time a new question appears. But
-that becomes brittle very quickly, especially when the evidence is already
-sitting in images and descriptions and users can phrase the same intent in many different ways. The queries we ask in the real world rarely tend to follow a pattern.
-
-It's not that graphs + vector search over the properties can’t help answer fuzzy questions. But even with vector search, we can only go so far as capturing the semantics of features in text or image properties that already exist. Essentially, the GraphRAG pattern we've all gotten so familiar with.
-
-Alright! We're now ready to explore a different way of doing search using associative candidates from the evidence we already have, while preserving the graph as the source of factual relationships.
+So it's not that graphs + vector search over the properties can’t help answer fuzzy questions. Essentially, the GraphRAG pattern we've all gotten so familiar with. But even with vector search, we can only go so far as capturing the semantics of features in text or image properties that already exist.
 -->
 
 ---
@@ -1004,41 +994,29 @@ class: spaces-are-graphs-slide
 </style>
 
 <!--
-To build that bridge, I want to start with a useful mental model: a graph is a
+Let's now dive deeper into higher-dimensional geometries. As we know, a graph is a
 discrete representation of something we can also express in a continuous, very
 high-dimensional space.
 
-On the right, we have the familiar graph: a finite set of nodes and edges. On
-the left, the mesh is a three-dimensional projection of a space that might
-actually have ten thousand dimensions or more. And importantly, this isn’t just
-an embedding space produced from the text properties on those nodes. This is a
-hypervector space, which we’ll define more rigorously in the next few slides.
+We start with a very familiar graph representation: a finite set of nodes and edges. The fuzzy manifold you see is essentially a 3D projection of a much higher-dimensional space that models the same graph data. And importantly, this isn’t just
+an embedding space produced from the text properties on those nodes. This is what we call
+hypervector space, which we’ll define more rigorously in the next few slides as we introduce hyper-dimensional computing.
 
-As the two representations move together, the graph isn’t being placed inside
-the space as a discrete graph that stays intact. The information in the graph is being
-re-encoded. A node, a relationship, or a larger piece of graph structure can
-all be represented as hypervectors and then composed using algebra.
+As the two representations move together, observe the part of the animation that shows the graph isn’t being placed inside the space as a discrete graph that stays intact. The information in the graph is being re-encoded. A node, a relationship, or a larger piece of graph structure can
+all be represented as hypervectors in this high-dimensional space, and then composed using algebra.
 
 Consider two nodes from our graph that represent very different concepts: a Person and a
 Location. In the animation, those nodes move to a common origin and become two
 arrows. The direction of each arrow carries its identity. The Person
 hypervector points in one direction, while the Location hypervector points in
-a very different, nearly orthogonal direction. That separation is what lets us
-distinguish unrelated concepts, even when thousands of them share the same
-space.
+a very different, nearly orthogonal direction. In fact, the shape of this manifold is decided by each and every one of these hypervectors, which all point in different directions and have different magnitudes. Concepts that are similar, like person or location, tend to have hypervectors that are pointing in the same direction, that is, they have a high cosine similarity in this space.
 
-When we weight and combine hypervectors, the size of a concept’s contribution
-can express how strongly it’s present relative to other concepts. But the
-atomic hypervectors themselves are typically given the same norm, so it’s
-primarily their direction, rather than their raw length, that tells us what
-they represent.
-
-The edges aren’t lost either. We can encode relationships and roles, and we can
-combine many of them into a single distributed representation while retaining
-enough structure to compare or recover what was encoded. We’ll see the actual
+This idea is especially powerful because in this high-dimensional space with hypervectors,
+we can encode not only nodes and their properties,  but also entire paths including
+the relationships between nodes. We’ll see the actual
 operations that make that possible shortly.
 
-So the graph and this projected manifold are modeling the same underlying data
+So the graph and this high-dimensional projected manifold are modeling the same underlying data
 in two different ways. One is discrete and explicit. The other is continuous
 and distributed. The graph is very good at stating what we know as fact, while
 the high-dimensional representation gives us a way to work with softer,
@@ -1116,9 +1094,9 @@ Seattle, and Visited each receive a long, reproducible hypervector. We don’t
 train a deep network to discover those initial directions. A seeded process can
 generate them once and recreate them whenever we need them.
 
-From there, HDC gives us the three-part loop on the right.
+From there, HDC gives us the three parts on the right.
 
-First, we represent: each concept gets its own hypervector.
+First, we encode: each concept gets its own hypervector.
 
 Then, we compose. We can combine Person, Visited, and Seattle to encode a richer
 fact, such as a person visiting Seattle. The result is still a hypervector of
@@ -1128,17 +1106,13 @@ Finally, we retrieve. We compare a query with stored hypervectors, usually using
 cosine similarity, and the closest representations point toward related concepts
 or candidate answers.
 
-This isn’t simply a conventional text embedding. The geometry reflects the
-symbols, roles, relationships, and combinations we chose to encode. The graph’s
-structure has been translated into vector algebra, not discarded.
+Again, it's worth lingering on the fact that isn’t simply a conventional text embedding. The hyperdimensional geometry reflects symbols, roles, types, relationships, and their combinations we chose to encode. The graph’s structure has been translated into vector algebra.
 
 If this is new to you, I strongly recommend the two papers at the bottom.
 Pentti Kanerva’s 2009 paper, “Hyperdimensional Computing,” is the foundational
-introduction. Kleyko and colleagues’ “Vector Symbolic Architectures as a
-Computing Framework for Emerging Hardware” gives a broader, more modern view.
+introduction and introduces the concepts of HDC. Kleyko and colleagues’ “Vector Symbolic Architectures as a Computing Framework for Emerging Hardware” gives a broader, more modern, practitioner lens.
 
-That’s the basic loop: represent, compose, and retrieve. Now let’s see where the
-initial hypervectors come from by building a codebook for our domain vocabulary.
+So that’s the basic loop: represent, compose, and retrieve.
 -->
 
 ---
@@ -1210,11 +1184,10 @@ class: hypervector-slide
 </style>
 
 <!--
-Before we can encode a record, we need atomic hypervectors for the terms in our
-domain. In this example, we walk through the Person, Location, and VISITED data,
-along with the extracted image features, to build a vocabulary. It includes
+How does encoding work, exactly? We need hypervectors for each of the entities and relationships in our domain. In this example, we walk through the Person, Location, and VISITED data, along with the extracted image features, to build a vocabulary. It includes
 roles like “feature,” values like “mountains,” and relationships like “VISITED.”
 
+This slide shows a simple starting point: creating a vocabulary of terms for the domain.
 Step one is the left side: initialize once. A seeded pseudorandom generator
 assigns each vocabulary token one arbitrary ten-thousand-dimensional pattern of
 plus ones and minus ones. You can think of that pattern as a long barcode. The
@@ -1229,11 +1202,9 @@ Every later occurrence of “mountains” receives that same M. What's “random
 how the hypervector assignment is created upfront;  what's “deterministic” is every use after
 that.
 
-The key takeaway from this slide is that we need to define an encoder to turn a raw record into a hypervector.  A codebook is also not the only way to encode data into hypervectors. It’s an
-easy place to begin with a discrete vocabulary because every step is visible.
-More advanced encoders can handle continuous values, sequences, structured
-inputs, or learned features. Those are directions I’ll cover in future talks
-and demos.
+The key takeaway from this slide is that we need to define an encoder to turn a raw record into a hypervector.  A codebook is a very rudimentary way to encode data into hypervectors. It’s an
+easy place to begin with a discrete vocabulary because every step is transparent and inspectable.
+But in the real world, you'd build more advanced encoders can handle continuous values, sequences, structured inputs, or learned features. Those are directions for future talks and blog posts.
 -->
 
 ---
@@ -1407,10 +1378,9 @@ class: orthogonality-slide
 </style>
 
 <!--
-So why does the high dimensionality matter? Why did we choose 10 thousand dimensions? We can. run a  simple experiment to check the underlying assumption we just made about
-random hypervectors.
+Why does the high dimensionality matter? Why did we choose 10 thousand dimensions and not fewer? We can run a  simple experiment to convince ourselves why this matters.
 
-We generate two thousand independent pairs of 10 thousand dimension, bipolar hypervectors (bipolar means the values in the hypervector are are discrete integers between -1 and +1).  We then measure the cosine similarity within each pair and plot
+We generate two thousand independent pairs of 10 thousand-dimension, bipolar hypervectors (bipolar means the values in the hypervector are are discrete integers between -1 and +1).  We then measure the cosine similarity within each pair and plot
 the two thousand scores as this histogram.
 
 If unrelated hypervectors frequently collided, we’d see many scores spread far
@@ -1749,17 +1719,17 @@ Speaker notes:
 </style>
 
 <!--
-Where this gets really interesting is how HDC lets you encode not only nodes, but also entire edges in the graph. This slide shows an example of how you can use the same bind + bundle operations, to encode the path "Person" -[VISITED]> "Location" as a hypervector.
+Where this gets really interesting is how HDC lets you encode not only nodes, but also entire paths in the graph. This slide shows an example of how you can use the same bind + bundle operations, to encode the path triple "Person" -[VISITED]> "Location" as a subject-predicate-object (or S-P-O) hypervector.
 
-This is essentially an S-P-O or subject-predicate-object hypervector. Let's walk through this example. We have the person Maya Chen and her features. We bind each feature, and bundle them like before to get the Maya node hypervector.
+Let's walk through this example. We have the person Maya Chen and her feature values. We bind each of them first, and then bundle them like before to get the "Maya node hypervector".
 
 Next, we have a relationship predicate: VISITED. There's only one thing to bind here: the type, "visited", and we get its hypervector.
 
-Finally, we have the Location Seattle, which we already showed how to bind and bundle into one hypervector.
+Finally, we have the Location Seattle, which we already showed before how to bind and bundle into one hypervector.
 
-Putting these three together, we can now apply a final associative binding operation to combine them into one FINAL hypervector to produce a new hypervector that represents that path between Maya Chen and Seattle.
+Putting these three together, we can now apply another associative binding operation to combine them into one FINAL hypervector that represents that *path* between Maya Chen and Seattle.
 
-So hopefully, it makes sense how clean the algebra is. Using these two simple operations of binding and bundling, you can represent both nodes and relationships entirely in hypervector space. We've essentially transformed a discrete space into a continuous space using vector arithmetic.
+So hopefully, it makes sense how clean and composable this kind of algebra is. Using these two simple operations of binding and bundling, you can represent both nodes and relationships entirely in hypervector space. We've essentially transformed a discrete space into a continuous space using vector arithmetic. Because the algebra is invertible, you can recover its parts by running the corresponding inverse operation.
 -->
 
 ---
@@ -1845,7 +1815,7 @@ Permutation uses a fixed rotation, and is also invertible. To inspect a position
 position’s rotation and compare the result with the event hypervectors we know.
 That lets us recover that the Space Needle was Maya’s first visit.
 
-Note that permutation doesn’t understand the concept of by itself. It's just like a sequence property in a database, we decide that one arrangement means first and another means second.
+Note that permutation doesn’t understand the concept of time by itself. It's just like a sequence property in a database, we decide that one arrangement means first and another means second.
 
 The demo for this talk uses only binding and bundling, but not permutation. I’m only including
 it as a future direction for ordered histories and agent memory. But for now, let’s return
@@ -1905,7 +1875,7 @@ class: lance-stack-slide
 </style>
 
 <!--
-The key idea in this slide is that graph traversal and hypervector search should not need separate copies of the data.
+From a storage perspective, graph traversal and hypervector search should not need separate copies of the data. This slide views how I think about this through the LanceDB lens.
 
 We start at the bottom with Lance format. Lance is a columnar, Arrow-native lakehouse format that stores data in tables, with strictly typed schemas. In this demo, Person, Location, and VISITED are three Lance tables. The same table can hold scalars, fixed-size hypervectors, and multimodal assets such as image bytes as separate columns. Lance also gives us versioning, schema evolution, fast scans, and random access.
 
@@ -2280,7 +2250,7 @@ class: csr-slide
 </style>
 
 <!--
-For dense graphs with many relationships, we need to be smarter about storing subject–predicate–object, or S-P-O, path hypervectors. Materializing one for every possible pair grows quadratically and becomes impractical very quickly.
+For dense graphs with many relationships, we need to be clever about storing subject–predicate–object, or S-P-O, path hypervectors. Materializing one for every possible pair grows quadratically and becomes impractical very quickly.
 
 Instead, we could use the vector index to generate candidate paths, retain only the top k for each node, and store those relationships in a compressed sparse row, or CSR, layout. CSR is simply a compact adjacency representation: offsets into a neighbor list, the neighbor IDs, and optionally their scores.
 
@@ -2300,9 +2270,9 @@ class: next-edge-slide
   <Eyebrow>Beyond retrieval: HDC for Machine Learning</Eyebrow>
   <h1>From associative search to associative <i>memory</i></h1>
   <p class="lede">The encoder stays fixed. Learning happens by accumulating experience into memory.</p>
-  <div class="next-edge-visual" role="img" aria-label="Maya's ordered VISITED edges are encoded as a hypervector, compared with destination prototypes in Associative Memory, and used to predict her next VISITED edge">
+  <div class="next-edge-visual" role="img" aria-label="Maya's known visit history is encoded as a hypervector, used to update destination prototypes, and compared with those prototypes to predict her next visit">
     <div class="graph-context-panel">
-      <small>GRAPH CONTEXT AT TIME <i>t</i></small>
+      <small>MAYA'S KNOWN GRAPH CONTEXT</small>
       <svg viewBox="0 0 310 105" aria-hidden="true">
         <defs><marker id="next-edge-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ff8b68"/></marker></defs>
         <path d="M82 38 C113 38 142 38 176 38" fill="none" stroke="#ff8b68" stroke-width="2" marker-end="url(#next-edge-arrow)"/>
@@ -2311,44 +2281,44 @@ class: next-edge-slide
         <rect x="184" y="13" width="111" height="50" rx="11" fill="rgba(255,115,74,.07)" stroke="#ff8b68" stroke-width="2"/>
         <text x="239.5" y="34" class="next-node-type">Location</text><text x="239.5" y="51" class="next-node-name">Pike Place</text>
         <rect x="97" y="25" width="78" height="20" rx="5" fill="#1d1713" stroke="rgba(255,115,74,.36)"/>
-        <text x="136" y="38" class="next-edge-label">VISITED @ t</text>
-        <text x="239.5" y="85" class="next-evidence-label">E(Lt): multimodal evidence</text>
+        <text x="136" y="38" class="next-edge-label">VISITED</text>
+        <text x="239.5" y="85" class="next-evidence-label">multimodal evidence</text>
       </svg>
       <div class="recent-visits">
-        <span><small><i>t</i>−1</small><b>Space Needle</b></span><i>→</i><span><small><i>t</i></small><b>Pike Place</b></span>
+        <span><small>FIRST</small><b>Space Needle</b></span><i>→</i><span><small>THEN</small><b>Pike Place</b></span>
       </div>
     </div>
     <div class="story-arrow"><span>encode</span><b>→</b></div>
     <div class="context-hv-panel">
       <small>FIXED ENCODER <i>φ</i></small>
-      <strong>h<sub>i,t</sub></strong>
+      <strong>h</strong>
       <div class="context-hv-stripe"></div>
       <div class="operation-tags"><span>bind</span><span>bundle</span><span>permute</span></div>
       <p>one vector for the graph context</p>
     </div>
     <div class="story-arrow"><span>query</span><b>→</b></div>
     <div class="associative-memory-panel">
-      <div class="memory-heading"><span>ASSOCIATIVE MEMORY</span><small>destination class prototypes</small></div>
-      <div class="prototype-row"><code>M<sub>ℓ₁</sub></code><i class="prototype-stripe p1"></i><span>Space Needle</span></div>
-      <div class="prototype-row"><code>M<sub>ℓ₂</sub></code><i class="prototype-stripe p2"></i><span>Pike Place</span></div>
-      <div class="prototype-row"><code>M<sub>ℓ₃</sub></code><i class="prototype-stripe p3"></i><span>another candidate</span></div>
-      <div class="predicted-edge"><span>P<sub>i</sub></span><b>—[ VISITED<sub>next</sub> ]→</b><strong>ℓ̂<sub>i,t+1</sub></strong></div>
+      <div class="memory-heading"><span>ASSOCIATIVE MEMORY</span><small>one prototype per destination</small></div>
+      <div class="prototype-row"><code>P₁</code><i class="prototype-stripe p1"></i><span>Space Needle</span></div>
+      <div class="prototype-row"><code>P₂</code><i class="prototype-stripe p2"></i><span>Pike Place</span></div>
+      <div class="prototype-row"><code>P₃</code><i class="prototype-stripe p3"></i><span>Another location</span></div>
+      <div class="predicted-edge"><span>Maya</span><b>—[ VISITS NEXT ]→</b><strong>Discovery Park?</strong></div>
     </div>
   </div>
   <div class="next-edge-math">
     <div class="context-math-block">
       <small>1 · FIXED REPRESENTATION</small>
-      <code>h<sub>i,t</sub> = φ(graph context through time <i>t</i>)</code>
+      <code>h = φ(Maya's known history)</code>
       <p>φ uses bind · bundle · permute</p>
     </div>
     <div class="memory-math-block">
       <small>2 · BUILD AND QUERY THE MEMORY</small>
-      <code>M<sub>y</sub> ← M<sub>y</sub> + h<sub>i,t</sub></code>
-      <code>ℓ̂ = arg max<sub>ℓ∈C<sub>G</sub></sub> cos(h<sub>i,t</sub>, M<sub>ℓ</sub>)</code>
-      <p>y = observed next Location · recall by similarity</p>
+      <code>P<sub>Discovery Park</sub> ← P<sub>Discovery Park</sub> + h</code>
+      <code>predict: max cosine(h<sub>new</sub>, P<sub>destination</sub>)</code>
+      <p>update the stored prototype · compare a new history</p>
     </div>
   </div>
-  <p class="next-edge-takeaway"><strong>Learned-representation ML updates the encoder.</strong> HDC keeps <i>φ</i> fixed and builds memory with simple vector operations.</p>
+  <p class="next-edge-takeaway">Traditional ML learns the representation by updating the encoder.<br/>HDC keeps the representation <i>φ</i> fixed, <strong> but learns the memory</strong>, using simple algebra.</p>
 </div>
 
 <style>
@@ -2358,15 +2328,17 @@ class: next-edge-slide
 <!--
 We'll end with some food for thought for the machine learning folks in the audience. Could the same algebra for retrieving similar graph entities work for predicting graph relationships?
 
-In HDC literature, a prototype is a memory for a class, built by bundling encoded examples with the same label. Think of it as centroid-like: recurring structure reinforces, while one-off details fade.
+In HDC literature, each possible outcome has a "prototype": which is a memory built by bundling the encoded examples associated with that outcome. It works somewhat like computing a centroid. Features that are recurring across examples reinforce one another, while one-off details tend to fade, leaving a representative memory of that outcome.
 
-Here, each possible next Location is a class. Before predicting, we gather everything currently known about Maya: her identity, the VISITED relationship, the ordered sequence of recent visits, and the current multimodal evidence. The fixed encoder combines these inputs into one hypervector, h. If Maya visits Pike Place next, h becomes a training example for the Pike Place class, so we bundle it into Pike Place’s prototype hypervector. Repeated across many histories, that prototype summarizes the patterns that typically precede a visit to Pike Place.
+For this prediction task, we treat each possible next Location as a "class", which is one of the outcomes the model can choose. HDC stores one prototype for each class. 
 
-This makes this more like associative *memory*: a new situation *recalls* the outcome associated with similar past situations. We compare its hypervector with the destination prototypes and choose the closest match.
+Suppose we know that Maya has visited the Space Needle and then Pike Place. The encoder combines everything known up to that point: her identity, the VISITED relationship, the ordered visit history, and the available multimodal evidence, into one hypervector, h. If she visits Discovery Park next, we update the persistent Discovery Park prototype by adding h to it. In simpler terms, we are recording that a history like this led to Discovery Park. Repeating this across many trajectories builds one prototype for each possible destination.
 
-It's interesting how different this is from traditional machine learning. A neural network normally learns by changing encoder weights, so the representation itself is learned. In HDC, the representation stays fixed, but learning accumulates the experience via binding and bundling into a class memory. We can then use cosine similarity to recall the closest memory. No backpropagation needed.
+At prediction time, we don't update anything. We encode Maya's latest known history as a new hypervector and compare it with every destination prototype. If it's most similar to the Discovery Park prototype, Discovery Park becomes the prediction. The memory is predictive because each prototype summarizes the kinds of situations that previously led to that outcome, much like a nearest-centroid classifier. Imagine a "fuzzy cloud" that shifts its location based on all the complex features encoded inside its hypervector. 
 
-The graph constraints the valid destinations, and HDC chooses among them. These are some interesting ideas, if implemented, shows how HD-based retrieval could power a lightweight online learning algorithm over graph-like events.
+This is very different from traditional machine learning. A neural network usually learns by changing encoder weights, so the representation itself is learned. Here, the encoder stays fixed; learning happens by accumulating past memories in the prototypes, and prediction is a cosine-similarity comparison against those memories. No backpropagation needed. HDC is basically an "online learner" that relies on the same simple algebra operators (binding, bundling and permutation).
+
+We didn't implement associative memory or permutation operators in this demo, but it's fascinating to think about how HDC could become a lightweight online predictor over graph events.
 -->
 
 ---
