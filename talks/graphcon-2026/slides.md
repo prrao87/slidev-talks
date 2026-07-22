@@ -634,12 +634,12 @@ class: dataset-schema-slide
           <path d="M145 155 C188 126 233 106 277 92" marker-end="url(#ghost-schema-arrow)"/>
           <path d="M480 190 C514 198 536 217 553 239" marker-end="url(#ghost-schema-arrow)"/>
           <g class="ghost-edge-label">
-            <rect x="182" y="111" width="84" height="26" rx="7" class="ghost-edge-chip"/>
-            <text x="224" y="129" class="ghost-edge-text">WORKS_AT</text>
+            <rect x="187" y="113" width="74" height="22" rx="6" class="ghost-edge-chip"/>
+            <text x="224" y="128" class="ghost-edge-text">WORKS_AT</text>
           </g>
           <g class="ghost-edge-label">
-            <rect x="491" y="201" width="92" height="26" rx="7" class="ghost-edge-chip"/>
-            <text x="537" y="219" class="ghost-edge-text">LOCATED_IN</text>
+            <rect x="495" y="203" width="84" height="22" rx="6" class="ghost-edge-chip"/>
+            <text x="537" y="218" class="ghost-edge-text">LOCATED_IN</text>
           </g>
           <g transform="translate(267 17)">
             <circle cx="48" cy="48" r="48"/>
@@ -651,10 +651,10 @@ class: dataset-schema-slide
           </g>
         </g>
         <g class="active-schema">
-          <path d="M160 190 H206"/>
-          <path d="M334 190 H380" marker-end="url(#active-schema-arrow)"/>
-          <rect x="206" y="174" width="128" height="32" rx="7" class="edge-chip"/>
-          <text x="270" y="194" class="edge-text">VISITED</text>
+          <path d="M160 190 H215"/>
+          <path d="M325 190 H380" marker-end="url(#active-schema-arrow)"/>
+          <rect x="215" y="176.5" width="110" height="27" rx="6" class="edge-chip"/>
+          <text x="270" y="193.5" class="edge-text">VISITED</text>
           <text x="270" y="220" class="edge-helper">conceptually: has visited</text>
           <g transform="translate(30 130)">
             <circle cx="80" cy="60" r="50"/>
@@ -717,13 +717,13 @@ class: dataset-schema-slide
 .ghost-schema path{fill:none;stroke:#81766d;stroke-width:1.7;stroke-dasharray:6 6;opacity:.42}
 .ghost-schema circle{fill:rgba(129,118,109,.055);stroke:#81766d;stroke-width:1.5;stroke-dasharray:5 5;opacity:.52}
 .ghost-edge-chip{fill:rgba(15,13,11,.92);stroke:#81766d;stroke-width:1;opacity:.82}
-.ghost-edge-text{fill:#9a8f86;font:11px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
+.ghost-edge-text{fill:#9a8f86;font:9.5px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .node-type{fill:rgba(240,231,220,.48);font:600 14px 'Geist',sans-serif;text-anchor:middle}
 .node-state{fill:#81766d;font:11px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .active-schema>path{fill:none;stroke:#ff734a;stroke-width:3}
 .active-schema circle{fill:rgba(255,115,74,.08);stroke:#ff8b68;stroke-width:2}
 .edge-chip{fill:transparent;stroke:rgba(255,115,74,.68);stroke-width:1.2}
-.edge-text{fill:#ff9e80;font:700 12px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
+.edge-text{fill:#ff9e80;font:700 10.5px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .edge-helper{fill:rgba(240,231,220,.58);font:12px 'Geist',sans-serif;text-anchor:middle}
 .active-type{fill:#f0e7dc;font:700 21px 'Geist',sans-serif;text-anchor:middle}
 .active-subtype{fill:#ff9e80;font:13px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
