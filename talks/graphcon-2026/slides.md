@@ -725,7 +725,7 @@ class: dataset-schema-slide
 .edge-chip{fill:transparent;stroke:rgba(255,115,74,.68);stroke-width:1.2}
 .edge-text{fill:#ff9e80;font:700 10.5px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .edge-helper{fill:rgba(240,231,220,.58);font:12px 'Geist',sans-serif;text-anchor:middle}
-.active-type{fill:#f0e7dc;font:700 21px 'Geist',sans-serif;text-anchor:middle}
+.active-type{fill:#f0e7dc;font:700 17.5px 'Geist',sans-serif;text-anchor:middle}
 .active-subtype{fill:#ff9e80;font:13px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .active-samples{fill:rgba(240,231,220,.68);font:11px 'Geist',sans-serif;text-anchor:middle}
 .schema-legend text{fill:rgba(240,231,220,.58);font:12px 'Geist',sans-serif}
