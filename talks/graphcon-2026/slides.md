@@ -631,32 +631,39 @@ class: dataset-schema-slide
           <marker id="ghost-schema-arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0,0 L0,8 L9,4 z" fill="#81766d"/></marker>
         </defs>
         <g class="ghost-schema">
-          <path d="M145 143 C195 106 242 86 275 80" marker-end="url(#ghost-schema-arrow)"/>
-          <path d="M490 213 C524 226 541 240 552 251" marker-end="url(#ghost-schema-arrow)"/>
-          <text x="218" y="96">WORKS_AT</text>
-          <text x="531" y="224">LOCATED_IN</text>
-          <g transform="translate(275 23)">
-            <circle cx="55" cy="55" r="55"/>
-            <text x="55" y="60" class="node-type">Company</text>
+          <path d="M145 155 C188 126 233 106 277 92" marker-end="url(#ghost-schema-arrow)"/>
+          <path d="M480 190 C514 198 536 217 553 239" marker-end="url(#ghost-schema-arrow)"/>
+          <g class="ghost-edge-label">
+            <rect x="182" y="111" width="84" height="26" rx="7" class="ghost-edge-chip"/>
+            <text x="224" y="129" class="ghost-edge-text">WORKS_AT</text>
           </g>
-          <g transform="translate(548 205)">
-            <circle cx="55" cy="55" r="55"/>
-            <text x="55" y="60" class="node-type">Country</text>
+          <g class="ghost-edge-label">
+            <rect x="491" y="201" width="92" height="26" rx="7" class="ghost-edge-chip"/>
+            <text x="537" y="219" class="ghost-edge-text">LOCATED_IN</text>
+          </g>
+          <g transform="translate(267 17)">
+            <circle cx="48" cy="48" r="48"/>
+            <text x="48" y="53" class="node-type">Company</text>
+          </g>
+          <g transform="translate(542 222)">
+            <circle cx="48" cy="48" r="48"/>
+            <text x="48" y="53" class="node-type">Country</text>
           </g>
         </g>
         <g class="active-schema">
-          <path d="M170 190 C240 190 312 190 385 190" marker-end="url(#active-schema-arrow)"/>
-          <rect x="214" y="165" width="128" height="31" rx="7" class="edge-chip"/>
-          <text x="278" y="185" class="edge-text">VISITED</text>
-          <text x="278" y="217" class="edge-helper">conceptually: has visited</text>
-          <g transform="translate(33 130)">
-            <circle cx="82" cy="60" r="55"/>
-            <text x="82" y="67" class="active-type">Person</text>
+          <path d="M160 190 H206"/>
+          <path d="M334 190 H380" marker-end="url(#active-schema-arrow)"/>
+          <rect x="206" y="174" width="128" height="32" rx="7" class="edge-chip"/>
+          <text x="270" y="194" class="edge-text">VISITED</text>
+          <text x="270" y="220" class="edge-helper">conceptually: has visited</text>
+          <g transform="translate(30 130)">
+            <circle cx="80" cy="60" r="50"/>
+            <text x="80" y="67" class="active-type">Person</text>
           </g>
-          <g transform="translate(358 130)">
-            <circle cx="82" cy="60" r="55"/>
-            <text x="82" y="58" class="active-type">Location</text>
-            <text x="82" y="80" class="active-subtype">(city)</text>
+          <g transform="translate(350 130)">
+            <circle cx="80" cy="60" r="50"/>
+            <text x="80" y="58" class="active-type">Location</text>
+            <text x="80" y="80" class="active-subtype">(city)</text>
           </g>
         </g>
         <g class="schema-legend" transform="translate(42 328)">
@@ -709,12 +716,13 @@ class: dataset-schema-slide
 .schema-card svg{display:block;width:100%;height:343px}
 .ghost-schema path{fill:none;stroke:#81766d;stroke-width:1.7;stroke-dasharray:6 6;opacity:.42}
 .ghost-schema circle{fill:rgba(129,118,109,.055);stroke:#81766d;stroke-width:1.5;stroke-dasharray:5 5;opacity:.52}
-.ghost-schema>text{fill:#81766d;font:12px 'Geist Mono',ui-monospace,monospace;text-anchor:middle;opacity:.58}
+.ghost-edge-chip{fill:rgba(15,13,11,.92);stroke:#81766d;stroke-width:1;opacity:.82}
+.ghost-edge-text{fill:#9a8f86;font:11px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .node-type{fill:rgba(240,231,220,.48);font:600 14px 'Geist',sans-serif;text-anchor:middle}
 .node-state{fill:#81766d;font:11px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .active-schema>path{fill:none;stroke:#ff734a;stroke-width:3}
 .active-schema circle{fill:rgba(255,115,74,.08);stroke:#ff8b68;stroke-width:2}
-.edge-chip{fill:#241914;stroke:rgba(255,115,74,.52)}
+.edge-chip{fill:transparent;stroke:rgba(255,115,74,.68);stroke-width:1.2}
 .edge-text{fill:#ff9e80;font:700 12px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}
 .edge-helper{fill:rgba(240,231,220,.58);font:12px 'Geist',sans-serif;text-anchor:middle}
 .active-type{fill:#f0e7dc;font:700 21px 'Geist',sans-serif;text-anchor:middle}
