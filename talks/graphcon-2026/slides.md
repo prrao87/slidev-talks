@@ -1900,21 +1900,23 @@ class: lance-stack-slide
   <p class="lance-stack-takeaway">Store the evidence once. <strong>Let graph and vector search tools read different views of the same data.</strong></p>
 </div>
 
-<!--
-Speaker notes:
-- This is the architectural center of the demo: one `person-location/` directory contains three Lance datasets: Person, Location, and VISITED.
-- Lance is the shared columnar table/file format. It provides versioned datasets, schema evolution, and fast scans/random access for scalar, vector, and multimodal columns.
-- LanceDB is the data-management and vector-search interface: `graph_ingest.py` creates tables from Polars, `hdc_encode.py` adds fixed-size vector columns, and `hdc_retrieve.py` runs cosine search over `Location.vibe_hv`.
-- The precision boundary is deliberate: TorchHD performs encoding and algebra in float32; completed vectors are downcast once and persisted in Lance as fixed-size float16 lists. A stored vector is explicitly upcast before it re-enters TorchHD.
-- `lance-graph` opens those underlying `.lance` datasets directly, applies `GraphConfig`, and executes exact Cypher from each matched Location to connected Person nodes.
-- TorchHD still constructs the query hypervector; LanceDB now performs the nearest-neighbor comparison and returns cosine distance (`similarity = 1 - distance`).
-- The payoff is operational as well as conceptual: fuzzy candidates and exact graph validation cannot drift because they read the same rows instead of separately synchronized stores.
-- Sources: https://docs.lancedb.com/lance · https://docs.lancedb.com/tables · https://github.com/prrao87/hdc-lancedb/pull/5 · repository `src/graph_ingest.py`, `src/hdc_encode.py`, and `src/graph_retrieve.py`.
--->
-
 <style>
 .slidev-layout.lance-stack-slide{padding:88px 84px 40px}.lance-stack-content h1{margin:10px 0 6px;font-size:40px;line-height:1.1;letter-spacing:-.025em}.lance-stack-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:20px}.lance-stack-content>.lede code{color:var(--accent-soft);font-family:'Geist Mono',ui-monospace,monospace}.lance-stack-layout{display:grid;grid-template-columns:.93fr 1.07fr;gap:28px;height:420px;margin-top:22px}.lance-stack-copy{display:flex;flex-direction:column;justify-content:space-between;padding:4px 0}.stack-point{position:relative;padding-left:22px}.stack-point:before{content:'•';position:absolute;left:0;top:-2px;color:var(--fg);font-size:21px}.stack-point b{color:var(--accent);font-size:17px}.stack-point b code{color:inherit;font-family:'Geist Mono',ui-monospace,monospace}.stack-point p{margin:4px 0 0;color:rgba(240,231,220,.84);font-size:15px;line-height:1.35}.stack-point p code{color:rgba(240,231,220,.96);font:13px 'Geist Mono',ui-monospace,monospace}.stack-point.why{padding:12px 14px 12px 22px;border-left:2px solid var(--accent);background:rgba(255,115,74,.055)}.stack-point.why:before{display:none}.lance-stack-visual{display:flex;flex-direction:column;height:100%;padding:14px;border:1px solid var(--border);border-radius:14px;background:rgba(15,13,11,.72)}.stack-app{padding:12px 16px;border:1px solid rgba(255,115,74,.5);border-radius:9px;background:rgba(255,115,74,.055);text-align:center}.stack-app small,.stack-engine small,.format-heading small{display:block;color:var(--accent-soft);font-size:9px;font-weight:700;letter-spacing:.16em}.stack-app strong{display:block;margin-top:5px;color:var(--fg);font-size:16px}.stack-app strong i{color:var(--accent);font-style:normal}.stack-app span{display:block;margin-top:3px;color:rgba(240,231,220,.56);font:11px 'Geist Mono',ui-monospace,monospace}.stack-down{height:20px;color:rgba(240,231,220,.43);font:16px/20px 'Geist Mono',ui-monospace,monospace;text-align:center}.stack-engines{display:grid;grid-template-columns:1fr 1fr;gap:10px;height:116px}.stack-engine{padding:12px 14px;border:1px solid var(--border-strong);border-radius:9px;background:rgba(240,231,220,.025)}.stack-engine strong{display:block;margin:7px 0;color:var(--fg);font-size:17px}.stack-engine strong.product-brand{display:flex;align-items:center;gap:8px}.product-brand img{display:block;width:20px;height:20px;object-fit:contain}.stack-engine span{display:block;color:rgba(240,231,220,.63);font-size:11px;line-height:1.45}.graph-engine{border-color:rgba(255,115,74,.48);background:rgba(255,115,74,.04)}.graph-engine strong{color:var(--accent-soft);font-family:'Geist Mono',ui-monospace,monospace}.stack-down.compact{box-sizing:border-box;height:30px;padding:7px 0;font-size:10px;line-height:24px}.lance-format-layer{flex:1;padding:11px 14px;border:1px solid rgba(130,117,255,.45);border-radius:9px;background:linear-gradient(135deg,rgba(85,75,170,.11),rgba(255,115,74,.035))}.format-heading{display:flex;align-items:center;justify-content:space-between}.format-heading small{color:#9f92ff}.format-heading strong{color:var(--fg);font-size:16px}.format-heading strong.format-brand{display:flex;align-items:center;gap:8px}.format-brand img{display:block;width:22px;height:22px;object-fit:contain}.dataset-row,.column-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.dataset-row span{padding:6px;border-radius:5px;background:rgba(240,231,220,.06);color:rgba(240,231,220,.9);font:10px 'Geist Mono',ui-monospace,monospace;text-align:center}.column-row span{padding:5px;border:1px solid rgba(240,231,220,.08);border-radius:5px;color:rgba(240,231,220,.55);font:9px 'Geist Mono',ui-monospace,monospace;text-align:center}.format-traits{margin-top:8px;color:rgba(240,231,220,.66);font:10px 'Geist Mono',ui-monospace,monospace;text-align:center}.format-traits b{color:#9f92ff}.lance-stack-takeaway{margin:16px 0 0;color:rgba(240,231,220,.96);font-size:23px;font-weight:500;text-align:center}.lance-stack-takeaway strong{color:var(--accent-soft)}.slidev-layout.encoding-slide{padding:88px 84px 44px}.encoding-content h1{margin:10px 0 6px;font-size:40px;line-height:1.1;letter-spacing:-.025em}.encoding-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:21px}.encoding-takeaway{margin:19px 0 0;color:rgba(240,231,220,.96);font-size:24px;font-weight:500;text-align:center}.encoding-takeaway strong{color:var(--accent-soft)}
 </style>
+
+<!--
+The key idea in this slide is that graph traversal and hypervector search should not need separate copies of the data.
+
+We start at the bottom with Lance format. Lance is a columnar, Arrow-native lakehouse format that stores data in tables, with strictly typed schemas. In this demo, Person, Location, and VISITED are three Lance tables. The same table can hold scalars, fixed-size hypervectors, and multimodal assets such as image bytes as separate columns. Lance also gives us versioning, schema evolution, fast scans, and random access.
+
+Above that are two separate engines that operate over those tables. LanceDB is the data management layer above the format. It offers a lot of convenience utilities to run similarity search via an index over the hypervectors, so a fuzzy request such as “Pacific coast, mountains, and nature access” can produce ranked, likely entities.
+
+Beside it, lance-graph is a portable graph query engine that maps those same Lance tables to node labels and directed relationships. It can then run Cypher queries, for example, starting from a matched Location and traversing VISITED edges to the connected Person nodes.
+
+This gives the agent two complementary tools, operating on a single copy of the data.
+
+You store the evidence just once. LanceDB and lance-graph expose different views of the same data, so there is no second graph database to synchronize and no risk that retrieval and traversal are reasoning over different copies.
+-->
 
 ---
 layout: default
@@ -1938,6 +1940,18 @@ class: results-slide
 <style>
 .slidev-layout.results-slide,.slidev-layout.near-miss-slide{padding:88px 84px 44px}.results-content h1,.near-miss-content h1{margin:10px 0 6px;font-size:40px;line-height:1.1;letter-spacing:-.025em}.results-content>.lede,.near-miss-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:21px}.results-content>.lede code{color:var(--accent-soft);font-family:'Geist Mono',ui-monospace,monospace}.score-chart{position:relative;margin-top:25px;padding:50px 24px 20px;border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.76)}.score-axis{position:absolute;left:227px;right:259px;top:16px;display:flex;justify-content:space-between;color:rgba(240,231,220,.48);font:12px 'Geist Mono',ui-monospace,monospace}.threshold-line{position:absolute;left:calc(227px + (100% - 486px)*.25);top:42px;bottom:19px;border-left:1px dashed var(--accent)}.threshold-line span{position:absolute;top:-20px;left:6px;width:110px;color:var(--accent-soft);font:12px 'Geist Mono',ui-monospace,monospace}.score-row{display:grid;grid-template-columns:180px 1fr 235px;align-items:center;gap:18px;min-height:118px}.score-row+.score-row{border-top:1px solid var(--border)}.score-label strong{display:block;color:var(--fg);font-size:22px}.score-label small{display:block;margin-top:6px;color:rgba(240,231,220,.6);font-size:14px}.score-track{position:relative;height:25px;border-radius:999px;background:rgba(240,231,220,.09)}.score-track i{position:absolute;left:0;top:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent-soft))}.seattle .score-track i{width:92.75%}.slc .score-track i{width:55.5%;background:linear-gradient(90deg,#8c766d,#d78a72)}.score-track b{position:absolute;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);border:3px solid var(--bg-deep);border-radius:50%;background:var(--accent-soft)}.seattle .score-track b{left:92.75%}.slc .score-track b{left:55.5%;background:#d78a72}.score-track em{position:absolute;top:-31px;transform:translateX(-50%);color:var(--accent-soft);font-size:22px;font-style:normal;font-weight:750}.seattle .score-track em{left:92.75%}.slc .score-track em{left:55.5%;color:#d78a72}.score-features{display:flex;flex-wrap:wrap;gap:7px}.score-features span{padding:7px 8px;border:1px solid var(--border-strong);border-radius:7px;color:rgba(240,231,220,.74);font:12px 'Geist Mono',ui-monospace,monospace}.result-caption{display:flex;justify-content:center;align-items:center;gap:25px;margin-top:17px;padding:12px;border:1px solid var(--border-strong);border-radius:10px;background:rgba(15,13,11,.78)}.result-caption span{color:rgba(240,231,220,.58);font:13px 'Geist Mono',ui-monospace,monospace}.result-caption b{color:var(--accent-soft);font-size:18px}.result-caption strong{color:rgba(240,231,220,.88);font-size:16px}.results-takeaway,.near-miss-takeaway{margin:19px 0 0;color:rgba(240,231,220,.96);font-size:24px;font-weight:500;text-align:center}.results-takeaway strong,.near-miss-takeaway strong{color:var(--accent-soft)}
 </style>
+
+<!--
+With that stack in place, this is what retrieval looks like. We extract the query features, bind each one to its role, and bundle them into a query hypervector.  Kind of what we do in traditional vector search, except here, we pass it through the encoder, rather than an embedding model.
+
+We compare the query hypervector with each location’s bundled evidence hypervector using cosine similarity, which we then rank and threshold.
+
+Seattle scores the highest at 0.742. It matches the mountains and Pacific coast clues, and the graph connects it to Maya and Robby. Salt Lake City ranks lower at 0.444, but it still clears the threshold of 0.2 because mountains and nature access are meaningful matches.
+
+The gap of 0.298 reflects the missing Pacific coast evidence. Both cities are plausible enough to keep in context. Instead of forcing an early yes-or-no decision, we give the agent ranked candidates it can reason over.
+
+So why keep that second result at all? The comparison on the next slide makes the value clearer.
+-->
 
 ---
 layout: default
@@ -1966,6 +1980,16 @@ class: near-miss-slide
 <style>
 .city-evidence-compare{display:grid;grid-template-columns:1fr 150px 1fr;gap:20px;height:318px;margin-top:24px}.evidence-city{display:grid;grid-template-columns:1.12fr .88fr;border:1px solid var(--border-strong);border-radius:14px;overflow:hidden;background:rgba(15,13,11,.76)}.evidence-photo{position:relative}.evidence-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) contrast(1.04)}.evidence-photo strong{position:absolute;right:12px;top:12px;padding:8px 10px;border-radius:8px;background:rgba(10,8,7,.84);color:var(--accent-soft);font-size:26px}.evidence-photo span{position:absolute;left:12px;bottom:12px;padding:7px 9px;border-radius:6px;background:rgba(10,8,7,.84);color:var(--fg);font-size:15px;font-weight:650}.aligned-features{display:flex;flex-direction:column;justify-content:center;gap:12px;padding:18px}.aligned-features span{padding:10px 11px;border-radius:8px;font:13px 'Geist Mono',ui-monospace,monospace}.aligned-features .yes{color:rgba(240,231,220,.85);background:rgba(240,231,220,.055)}.aligned-features .emph{color:var(--accent-soft);border:1px solid rgba(255,115,74,.32);background:rgba(255,115,74,.08)}.aligned-features .no{color:rgba(240,231,220,.42);border:1px dashed rgba(240,231,220,.2)}.shared-column{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.shared-column span,.shared-column strong{color:rgba(240,231,220,.54);font:12px 'Geist Mono',ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em}.shared-column b{margin:6px 0;color:var(--fg);font-size:15px}.shared-column i{display:block;width:1px;height:35px;background:var(--border-strong)}.shared-column strong{margin-top:12px;color:var(--accent-soft)}.binary-vs-ranked{display:flex;align-items:center;justify-content:center;gap:25px;margin-top:17px}.binary-vs-ranked>div{display:flex;align-items:center;gap:14px;padding:11px 18px;border:1px solid var(--border-strong);border-radius:9px;background:rgba(15,13,11,.76)}.binary-vs-ranked small{color:rgba(240,231,220,.52);font-size:11px;letter-spacing:.08em}.binary-vs-ranked strong{color:var(--fg);font-size:16px}.binary-vs-ranked>b{color:var(--accent);font-size:22px}.near-miss-takeaway{margin-top:18px}
 </style>
+
+<!--
+Here's the difference between an exact match filter and associative search ranking.
+
+Seattle matches all four query features, so it scores highest. Salt Lake City shares the mountains and nature evidence, but it lacks the Pacific coast and waterfront evidence. That makes it a weaker result, not a meaningless one.
+
+A filtered graph traversal in Cypher tends to give us a binary result: either a match or no match. If Pacific coast is required, Salt Lake City disappears completely. HDC degrades more gracefully: it preserves the partial match and places it lower in the ranking.
+
+That matters when an agent begins with an incomplete description. It can still reach a useful part of the graph instead of falling off a cliff. This way, the HDC similarity can tells the agent what could be relevant, allowing it to verify further from the facts if needed.
+-->
 
 ---
 layout: default
@@ -2005,7 +2029,7 @@ ORDER BY p.name</code></pre>
       <small>candidate ∩ known paths = 3 ranked results</small>
     </div>
   </div>
-  <div class="validation-guardrail"><span>"Persons from cities in the Pacific coast": </span>Get candidates from HDC, then get facts + images from the same Lance table</div>
+  <div class="validation-guardrail"><span>"Persons who visited cities in the Pacific coast": </span>Get candidates from HDC, then get facts + images from the same Lance table</div>
   <p class="validation-takeaway"><strong>HDC proposes candidates.</strong> The graph confirms what we know is true.</p>
 </div>
 
@@ -2019,6 +2043,18 @@ ORDER BY p.name</code></pre>
 .known-stage .validated-row small{font-size:11px}
 .known-stage>small{margin-top:5px}
 </style>
+
+<!--
+HDC gave us ranked possibilities. Now we can separate relevant results from known facts.
+
+On the left, HDC proposes three candidate paths. The scores say the cities resemble the query, but they do not prove that these people visited them.
+
+In the middle, we can use the person IDs from HCC in lance-graph to run an exact Cypher pattern over Person, VISITED, and Location. That produces the complete set of known paths around that person, including Andre's visit to New York, which was never returned by HDC.
+
+We could intersect the relevant candidates with those known paths. HDC tells the agent where to look; the graph tells it what is known to be true.
+
+Because both steps use the same Lance rows, the agent can also fetch the supporting facts and original image evidence without switching data stores.
+-->
 
 ---
 layout: default
@@ -2065,14 +2101,6 @@ class: receipt-slide
   <p class="receipt-takeaway">Agents benefit from <strong>rich context.</strong></p>
 </div>
 
-<!--
-Speaker notes:
-- Evidence and multiple retrieval modes are not two unrelated benefits; they both follow from the same underlying problem: important domain knowledge often exists in forms that structured properties cannot fully represent.
-- A medical scan cannot be reduced permanently to diagnosis, size, and location. Satellite imagery cannot be reduced to a few land-use labels.
-- Those columns are useful, but they are selective interpretations created for today's task.
-- Keep the source modality as the durable record. Features, HDC encodings, and embeddings are derived representations that can change as the task changes.
--->
-
 <style>
 .receipt-content>h1{font-size:36px}.receipt-content>.lede code{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;color:var(--accent-soft);font-family:'Geist Mono',ui-monospace,monospace}.receipt-enrichment{display:grid;grid-template-columns:250px 48px 390px 1fr;gap:16px;align-items:stretch;height:260px;margin-top:14px}.media-source-card,.enriched-row-card,.row-outcome{border:1px solid var(--border-strong);border-radius:13px;background:rgba(15,13,11,.8)}.media-source-card{padding:12px}.media-source-card>small,.enriched-row-card>small,.row-outcome>small{display:block;color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.1em}.media-source-image{position:relative;height:100px;margin-top:8px;border-radius:8px;overflow:hidden}.media-source-image img{width:100%;height:100%;object-fit:cover;filter:saturate(.72) contrast(1.05)}.media-source-image span{position:absolute;left:8px;bottom:7px;padding:4px 6px;border-radius:5px;background:rgba(10,8,7,.82);color:var(--fg);font:9px 'Geist Mono',ui-monospace,monospace}.media-signal-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}.media-signal-list b{padding:4px 5px;border:1px solid rgba(255,115,74,.28);border-radius:6px;color:rgba(240,231,220,.84);font:8px 'Geist Mono',ui-monospace,monospace}.media-source-card>p{margin:7px 0 0;color:rgba(240,231,220,.58);font-size:10px;line-height:1.3}.enrichment-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}.enrichment-arrow span{color:rgba(240,231,220,.48);font:10px 'Geist Mono',ui-monospace,monospace;text-transform:uppercase}.enrichment-arrow b{color:var(--accent);font-size:29px}.enriched-row-card{padding:15px;border-color:rgba(255,115,74,.48);background:linear-gradient(180deg,rgba(255,115,74,.07),rgba(15,13,11,.82))}.enriched-row-card>strong{display:block;margin:6px 0 8px;color:var(--fg);font-size:18px}.row-field{display:grid;grid-template-columns:90px 1fr;align-items:center;gap:10px;padding:8px 10px;border-top:1px solid var(--border)}.row-field>span{color:var(--accent-soft);font:11px 'Geist Mono',ui-monospace,monospace}.row-field>code{display:block;padding:4px 7px!important;border:0!important;border-radius:5px;background:rgba(0,0,0,.22)!important;box-shadow:none!important;color:rgba(240,231,220,.82);font:12px 'Geist Mono',ui-monospace,monospace}.vector-field>i{display:block;height:22px;border-radius:5px;background-image:linear-gradient(90deg,#ff9e80 0 12%,#716b66 12% 28%,#a28cff 28% 45%,#716b66 45% 59%,#ff9e80 59% 77%,#716b66 77% 89%,#a28cff 89%)}.enriched-row-card>p{margin:7px 0 0;color:rgba(240,231,220,.54);font:10px 'Geist Mono',ui-monospace,monospace;text-align:center}.row-outcomes{display:grid;grid-template-rows:1fr 1fr;gap:10px}.row-outcome{padding:12px}.row-outcome>strong{display:block;margin-top:4px;color:var(--fg);font-size:15px}.row-outcome>div{display:flex;align-items:center;gap:9px;margin-top:7px;padding:6px 8px;border-radius:7px;background:rgba(240,231,220,.045)}.row-outcome>div b{color:var(--accent-soft);font-size:18px}.row-outcome>div span{color:rgba(240,231,220,.78);font:10px 'Geist Mono',ui-monospace,monospace}.row-outcome>p{margin:6px 0 0;color:rgba(240,231,220,.58);font-size:10px;line-height:1.3}.evidence-outcome{border-color:rgba(162,140,255,.38)}.evidence-outcome>small,.evidence-outcome>div b{color:#b8aaff}.receipt-bullets{display:grid;grid-template-columns:250px 454px 1fr;gap:16px;margin:12px 0 0;padding:0;list-style:none}.receipt-bullets li{position:relative;margin:0;padding-left:15px;color:rgba(240,231,220,.9);font-size:12px;line-height:1.3}.receipt-bullets li::before{content:'•';position:absolute;left:0;color:var(--accent)}.receipt-bullets code{color:var(--accent-soft);font:11px 'Geist Mono',ui-monospace,monospace}
 .receipt-enrichment{height:242px}.media-source-image{height:112px}.feature-list-field{grid-template-columns:72px 1fr}.feature-list-field>code{font-size:9.5px;white-space:nowrap}.receipt-captions{display:grid;grid-template-columns:250px 48px 390px 1fr;gap:16px;margin:0;padding-top:17px}.receipt-captions p{margin:0;color:rgba(240,231,220,.92);font-size:14px;line-height:1.35}.receipt-captions p:nth-child(1){grid-column:1}.receipt-captions p:nth-child(2){grid-column:3}.receipt-captions p:nth-child(3){grid-column:4}.receipt-captions code{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;color:var(--accent-soft);font:13px 'Geist Mono',ui-monospace,monospace}.receipt-takeaway{margin:18px 0 0;color:rgba(240,231,220,.96);font-size:20px;font-weight:550;text-align:center}.receipt-takeaway strong{color:var(--accent-soft)}
@@ -2082,6 +2110,19 @@ Speaker notes:
 .receipt-loop{position:relative;width:760px;height:330px;margin:22px auto 0}.loop-step{position:absolute;border:1px solid var(--border-strong);border-radius:13px;background:rgba(15,13,11,.82);overflow:hidden}.loop-step>span{display:block;color:var(--accent-soft);font-size:12px;font-weight:700;letter-spacing:.08em}.image-step{left:0;top:0;width:235px;height:140px}.image-step img{width:100%;height:100%;object-fit:cover;filter:saturate(.7)}.image-step span{position:absolute;left:10px;top:10px;padding:5px 7px;border-radius:5px;background:rgba(10,8,7,.8)}.image-step strong{position:absolute;left:10px;bottom:9px;padding:5px 7px;border-radius:5px;background:rgba(10,8,7,.8);color:var(--fg);font:12px 'Geist Mono',ui-monospace,monospace}.evidence-step{right:0;top:0;width:260px;height:140px;padding:17px}.evidence-step>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}.evidence-step b{padding:8px;border:1px solid rgba(255,115,74,.27);border-radius:7px;color:var(--fg);font:12px 'Geist Mono',ui-monospace,monospace}.validation-step{right:0;bottom:0;width:260px;height:125px;padding:17px}.candidate-loop-step{left:0;bottom:0;width:235px;height:125px;padding:17px}.validation-step strong,.candidate-loop-step strong{display:block;margin-top:17px;color:var(--fg);font-size:20px}.candidate-loop-step strong{color:var(--accent-soft);font-size:31px}.validation-step small,.candidate-loop-step small{display:block;margin-top:6px;color:rgba(240,231,220,.54);font-size:13px}.loop-arrow{position:absolute;color:var(--accent);font-size:28px}.loop-arrow.top{left:355px;top:46px}.loop-arrow.right{right:117px;top:145px}.loop-arrow.bottom{left:355px;bottom:43px}.loop-arrow.left{left:106px;top:145px}.loop-center{position:absolute;left:274px;top:103px;width:212px;height:124px;display:flex;flex-direction:column;justify-content:center;border:1px solid rgba(255,115,74,.4);border-radius:50%;background:radial-gradient(circle,rgba(255,115,74,.12),rgba(15,13,11,.9));text-align:center}.loop-center strong{color:var(--fg);font-size:19px}.loop-center span{margin-top:6px;color:var(--accent-soft);font-size:13px}.loop-center small{margin-top:5px;color:rgba(240,231,220,.52);font-size:12px}.receipt-result{position:absolute;right:84px;top:245px;width:285px;height:145px;display:none}.receipt-result img{width:100px;object-fit:cover}.receipt-takeaway{margin-top:17px}
 </style>
 
+<!--
+Conventional property graphs and graph databases usually leave the image itself out. They store a pointer URL, so the bytes must be fetched from another system and maintained and versioned separately from the graph.
+
+Here, the source modality stays with the entity. The same pattern can extend to medical scans, satellite imagery, maps, sensor streams, or any domain where structured properties cannot capture everything.
+
+The Seattle example was just for demonstration, but the encoder is the most important thing.
+The encoder decides which signals to extract, how to bind them to roles, and which representation to derive. In this demo, it converts image-derived labels into the vibe hypervector used for HDC search.
+
+We did not add an image embedding here, but the same row could store one for text-to-image or image-to-image semantic search. A different encoder gives the agent another useful view without changing the graph's factual structure.
+
+That is the payoff for agents: richer context. They can retrieve an entity, traverse its relationships, inspect the source modality, and use the representation best suited to the task.
+-->
+
 ---
 layout: default
 class: architecture-slide
@@ -2090,7 +2131,7 @@ class: architecture-slide
 <div class="architecture-content">
   <Eyebrow>Why the storage layer matters</Eyebrow>
   <h1>One dataset, multiple views.</h1>
-  <p class="lede">Graph topology, structured facts, HDC vectors, and raw image bytes stay co-located and co-versioned.</p>
+  <p class="lede">Graph topology, structured facts, hypervectors, and raw image bytes stay co-located and co-versioned.</p>
   <div class="architecture-map" style="height:335px">
     <div class="arch-consumer similarity"><span>HYPERVECTORS + VECTORS</span><strong>cosine over <code>vibe_hv</code></strong><small>associative search</small></div>
     <div class="arch-arrow a1">↖</div>
@@ -2124,6 +2165,16 @@ class: architecture-slide
 .architecture-boundary{margin-top:9px}
 .architecture-takeaway{margin-top:17px}
 </style>
+
+<!--
+This is the architecture that enables this. Person, VISITED, and Location form one LanceDB dataset containing properties, graph keys, hypervectors, and image bytes.
+
+We can think of graph topology, structured data, hypervectors and multimodal bytes as different views of the same data. Because these views are co-located and co-versioned, the similarity score, graph relationship, and supporting image all refer to the same data version. There are no separate stores to synchronize.
+
+I also want to emphasize that hypervectors by themselves aren't a replacement for graphs. They find a promising entry point; the graph supplies exact structure; the source modality supplies evidence. For really large datasets, a graph is still a more compact representation that occupies less disk space. Both representations have their own benefits.
+
+This leaves one big practical question: how do we store and search 10,000-dimensional vectors efficiently?
+-->
 
 ---
 layout: default
@@ -2170,21 +2221,21 @@ class: precision-slide
   <p class="precision-takeaway"><strong>Use compression for persistence and indexing.</strong> Get precision on HDC operations.</p>
 </div>
 
-<!--
-Speaker notes:
-- PR #5 makes the precision boundary concrete. TorchHD still creates and manipulates MAP hypervectors in float32; only completed vectors are downcast at the Arrow/Lance storage boundary.
-- A 10,000-dimensional vector occupies about 40 KB as float32 and 20 KB as float16, before index overhead. With two stored vectors per row, one million rows would therefore be roughly 80 GB versus 40 GB of raw coordinate payload.
-- The demo's MAP coordinates are small integers and are represented exactly in float16, so the tested Seattle and Salt Lake City ranking and scores do not change. Production workloads with wider numeric ranges must validate this precision choice.
-- TorchHD does not officially support MAP operations in float16. Any stored vector used in further binding, bundling, permutation, or prototype updates must first be promoted back to float32.
-- The demo still uses an exact flat scan because it has only three Location rows. For large tables, recommend evaluating LanceDB's `IVF_RQ` index, which uses RaBitQ quantization for compressed approximate retrieval.
-- Standard RaBitQ stores a 1-bit code per dimension plus small corrective values. For 10,000 dimensions, the bit code itself is 10,000 / 8 = 1,250 bytes. That is index representation, not a replacement for the persisted float16 vector column.
-- `IVF_RQ` requires a dimension divisible by 8; 10,000 qualifies. Tune partitions and validate recall against a sampled exact flat-search ground truth before adopting it.
-- Sources: https://github.com/prrao87/hdc-lancedb/pull/5 · https://docs.lancedb.com/indexing/quantization · https://docs.lancedb.com/indexing/vector-index
--->
-
 <style>
 .slidev-layout.precision-slide{padding:88px 84px 40px}.precision-badge{display:inline-block;padding:7px 10px;border:1px solid rgba(255,115,74,.36);border-radius:7px;background:rgba(255,115,74,.07);color:var(--accent-soft);font-size:12px;font-weight:750;letter-spacing:.09em}.precision-content h1{margin:10px 0 6px;font-size:40px;line-height:1.08;letter-spacing:-.025em}.precision-content>.lede{margin:0;color:rgba(240,231,220,.86);font-size:21px}.precision-flow{display:grid;grid-template-columns:1fr 78px 1fr 78px 1fr;gap:11px;height:280px;margin-top:21px}.precision-stage{display:flex;flex-direction:column;justify-content:center;padding:20px 18px;border-top:2px solid var(--accent);border-bottom:1px solid var(--border-strong);background:linear-gradient(180deg,rgba(255,115,74,.055),rgba(15,13,11,.7))}.precision-stage>small{color:var(--accent-soft);font-size:9px;font-weight:750;letter-spacing:.1em}.precision-stage>strong{margin-top:9px;color:var(--fg);font-size:20px;line-height:1.2}.precision-stage>code{display:block;margin-top:15px;padding:6px 7px!important;border-radius:6px;background:rgba(0,0,0,.24)!important;color:var(--fg)!important;font:15px 'Geist Mono',ui-monospace,monospace;text-align:center}.precision-stage>p{margin:12px 0 0;color:rgba(240,231,220,.68);font-size:14px;line-height:1.35;text-align:center}.precision-stage>em{margin-top:11px;color:rgba(240,231,220,.88);font-size:13px;font-style:normal;text-align:center}.precision-vector{display:block;height:37px;margin-top:17px;border-radius:5px}.compute-vector{background-image:linear-gradient(90deg,#ff9e80 0 12%,#6b645e 12% 27%,#a28cff 27% 44%,#6b645e 44% 59%,#41b6ff 59% 76%,#6b645e 76% 88%,#ff9e80 88%)}.persist-stage{border-top-color:#a28cff;background:linear-gradient(180deg,rgba(162,140,255,.055),rgba(15,13,11,.7))}.persist-stage>small{color:#b8aaff}.persist-stage>strong{font:17px/1.25 'Geist Mono',ui-monospace,monospace}.persist-vector{background-image:linear-gradient(90deg,#a28cff 0 18%,#625d58 18% 33%,#41b6ff 33% 52%,#625d58 52% 67%,#ff9e80 67% 84%,#625d58 84%)}.index-stage{border-top-color:#41b6ff;background:linear-gradient(180deg,rgba(65,182,255,.05),rgba(15,13,11,.7))}.index-stage>small{color:#7bd8ff}.bit-vector{background-size:16px 37px;background-image:linear-gradient(90deg,#41b6ff 0 48%,#263943 48%)}.precision-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.precision-arrow>span{color:rgba(240,231,220,.56);font:10px/1.3 'Geist Mono',ui-monospace,monospace}.precision-arrow>span i{color:var(--fg);font-style:normal}.precision-arrow>b{margin:8px 0;color:var(--accent);font-size:29px}.precision-arrow>small{color:rgba(240,231,220,.43);font-size:10px;line-height:1.25}.precision-guardrails{display:grid;grid-template-columns:.8fr 1.45fr 1fr;gap:11px;margin-top:14px}.precision-guardrails span{padding:10px 12px;border-left:2px solid rgba(162,140,255,.62);background:rgba(162,140,255,.035);color:rgba(240,231,220,.76);font-size:13px;text-align:center}.precision-guardrails b{margin-right:7px;color:#b8aaff;font-size:10px;letter-spacing:.08em}.precision-takeaway{margin:17px 0 0;color:rgba(240,231,220,.95);font-size:24px;font-weight:500;text-align:center}.precision-takeaway strong{color:var(--accent-soft)}
 </style>
+
+<!--
+This slide separates three decisions: compute precision, storage precision, and retrieval indexing.
+
+First, we need to keep the HDC algebra in float32. TorchHD requires this, because it does binding, bundling, permutation, and prototype updates there, which lend themselves to floating point operations. At 10,000 dimensions, each completed vector is about 40 kilobytes.
+
+Once the encoding is complete, we can downcast once and persist it in LanceDB as float16. That cuts the raw vector payload in half, to about 20 kilobytes per hypervector. If we need to do more HDC operations later, we promote it back to float32 prior to computing it.
+
+The demo has only three location records, so exact nearest-neighbor search is enough. At large scale, we can add a binary vector index called IVF_RQ, or RaBitQ in LanceDB. Its one-bit code is about 1.25 kilobytes for 10,000 dimensions, plus correction values. That index accelerates candidate retrieval and reduces index size, but it doesn't replace the stored float16 vector.
+
+There are several other compression techniques and fixed size list optimizations that make storage and retrieval more efficient, but in principle, it's possible to be judicious with the way storage and compute are done to increase the scale with which we can work. In the end, storage is cheap, so it's all about scaling the compute.
+-->
 
 ---
 layout: default
@@ -2224,19 +2275,21 @@ class: csr-slide
   <p class="csr-takeaway">If <i>k</i> stays fixed, edge storage becomes <strong>linear in the number of nodes.</strong></p>
 </div>
 
-<!--
-Speaker notes:
-- This slide is a separate future direction from the preceding RaBitQ slide. RaBitQ is an ANN index used to retrieve neighbors; CSR is an optional graph representation used to persist and traverse selected neighbor relationships.
-- Here, `k` is the maximum number of nearest neighbors retained per node. With `n` nodes, a directed top-k graph stores at most `n × k` adjacency entries.
-- If `k` remains a small constant as `n` grows, `O(nk)` reduces to `O(n)` edge storage. An undirected or symmetrized construction changes constant factors, not the asymptotic bound.
-- The dense comparison is `n(n−1)` directed edges or `n(n−1)/2` undirected edges, both `O(n²)`.
-- A plausible production path is: use `IVF_RQ` to generate candidate neighbors, keep only the useful top-k results per node, then write that adjacency in CSR-style arrays for graph traversal.
-- This CSR materialization is not implemented or benchmarked in the repository. The float16 storage boundary is shipped; this derived graph remains a research direction.
--->
-
 <style>
 .slidev-layout.csr-slide{padding:88px 84px 38px}.future-badge{display:inline-block;padding:7px 10px;border:1px solid rgba(255,115,74,.36);border-radius:7px;background:rgba(255,115,74,.07);color:var(--accent-soft);font-size:12px;font-weight:750;letter-spacing:.09em}.csr-content h1{margin:10px 0 6px;font-size:40px;line-height:1.08;letter-spacing:-.025em}.csr-content>.lede{margin:0;color:rgba(240,231,220,.86);font-size:20px}.csr-comparison{display:grid;grid-template-columns:250px 96px 250px 1fr;gap:15px;height:290px;margin-top:18px}.network-panel,.storage-panel{min-height:0;border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.76);padding:14px;text-align:center}.network-panel>span{color:var(--accent-soft);font-size:11px;font-weight:700;letter-spacing:.08em}.network-panel svg{display:block;width:100%;height:170px;margin-top:2px}.network-panel strong{display:block;color:var(--fg);font:20px 'Geist Mono',ui-monospace,monospace}.network-panel small{display:block;margin-top:5px;color:rgba(240,231,220,.52);font-size:12px}.csr-transform{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.csr-transform>b{color:var(--accent);font-size:27px}.csr-transform span{margin:8px 0 4px;color:rgba(240,231,220,.68);font-size:13px;line-height:1.35}.csr-transform span i{color:var(--accent-soft);font:700 15px 'Geist Mono',ui-monospace,monospace}.csr-transform small{margin-bottom:7px;color:#b8aaff;font:11px 'Geist Mono',ui-monospace,monospace}.storage-panel{text-align:left;padding:15px 16px}.storage-brand{display:flex;align-items:center;gap:9px;padding-bottom:10px;border-bottom:1px solid var(--border)}.storage-brand img{display:block;width:20px;height:20px;object-fit:contain}.storage-brand strong{color:var(--fg);font-size:18px}.storage-row{margin-top:10px;padding:10px;border:1px solid var(--border);border-radius:8px;background:rgba(0,0,0,.12)}.storage-row span{display:block;color:var(--accent-soft);font-size:12px;font-weight:650}.storage-row b{display:block;margin-top:6px;color:rgba(240,231,220,.75);font:12px 'Geist Mono',ui-monospace,monospace}.storage-row.csr-arrays{display:grid;grid-template-columns:1fr 1fr 1fr}.storage-row.csr-arrays span{grid-column:1/-1}.storage-row.csr-arrays b{margin-right:5px;padding:5px;border-radius:5px;background:rgba(255,115,74,.07);text-align:center}.storage-caveat{margin-top:10px;padding:8px 10px;border-left:3px solid var(--accent);background:rgba(255,115,74,.055)}.storage-caveat strong,.storage-caveat span{display:block;font-size:12px}.storage-caveat strong{color:var(--accent-soft)}.storage-caveat span{margin-top:4px;color:rgba(240,231,220,.72)}.csr-distinction{display:grid;grid-template-columns:auto 1fr 34px auto 1fr;align-items:center;gap:10px;margin-top:13px;padding:10px 16px;border-top:1px solid var(--border-strong);border-bottom:1px solid var(--border-strong);color:rgba(240,231,220,.65);font-size:13px;text-align:center}.csr-distinction b{color:var(--accent-soft);font:700 13px 'Geist Mono',ui-monospace,monospace}.csr-distinction i{color:rgba(240,231,220,.4);font-style:normal}.csr-takeaway{margin:14px 0 0;color:rgba(240,231,220,.95);font-size:23px;font-weight:500;text-align:center}.csr-takeaway strong{color:var(--accent-soft)}.csr-takeaway i{color:#b8aaff;font-family:'Geist Mono',ui-monospace,monospace}
 </style>
+
+<!--
+For dense graphs with many relationships, we need to be smarter about storing subject–predicate–object, or S-P-O, path hypervectors. Materializing one for every possible pair grows quadratically and becomes impractical very quickly.
+
+Instead, we could use the vector index to generate candidate paths, retain only the top k for each node, and store those relationships in a compressed sparse row, or CSR, layout. CSR is simply a compact adjacency representation: offsets into a neighbor list, the neighbor IDs, and optionally their scores.
+
+If k stays small and fixed, storage grows as n times k, which is effectively linear in the number of nodes.
+
+The distinction at the bottom is important. RaBitQ or a vector index helps answer, “Which nodes are similar?” CSR would persist selected answers so the agent can traverse them repeatedly. One searches; the other stores adjacency.
+
+If you look at the open-source lance-graph repo on GitHub, storing relationships via CSR is already a work in progress. As we incorporate HDC, CSR is also a promising way to store selected S-P-O triples discovered through associative search.
+-->
 
 ---
 layout: default
@@ -2246,7 +2299,7 @@ class: next-edge-slide
 <div class="next-edge-content">
   <Eyebrow>Beyond retrieval: HDC for Machine Learning</Eyebrow>
   <h1>From associative search to associative <i>memory</i></h1>
-  <p class="lede">Treat each possible destination as a class prototype; bundle the graph contexts that preceded it.</p>
+  <p class="lede">The encoder stays fixed. Learning happens by accumulating experience into memory.</p>
   <div class="next-edge-visual" role="img" aria-label="Maya's ordered VISITED edges are encoded as a hypervector, compared with destination prototypes in Associative Memory, and used to predict her next VISITED edge">
     <div class="graph-context-panel">
       <small>GRAPH CONTEXT AT TIME <i>t</i></small>
@@ -2284,38 +2337,37 @@ class: next-edge-slide
   </div>
   <div class="next-edge-math">
     <div class="context-math-block">
-      <small>1 · ENCODE THE PERSON'S GRAPH CONTEXT</small>
-      <code>F<sub>i,t−j</sub> = P<sub>i</sub> × R<sub>VISITED</sub> × L<sub>t−j</sub></code>
-      <code>h<sub>i,t</sub> = E(L<sub>t</sub>) + Σ<sub>j=0</sub><sup>k−1</sup> ρ<sup>j</sup>(F<sub>i,t−j</sub>)</code>
+      <small>1 · FIXED REPRESENTATION</small>
+      <code>h<sub>i,t</sub> = φ(graph context through time <i>t</i>)</code>
+      <p>φ uses bind · bundle · permute</p>
     </div>
     <div class="memory-math-block">
-      <small>2 · BUILD, QUERY, AND CORRECT THE PROTOTYPES</small>
-      <code>M<sub>ℓ</sub> = Σ<sub>(i,t): y<sub>i,t+1</sub>=ℓ</sub> h<sub>i,t</sub></code>
-      <code>ℓ̂<sub>i,t+1</sub> = arg max<sub>ℓ∈C<sub>G</sub>(i,t)</sub> cos(h<sub>i,t</sub>, M<sub>ℓ</sub>)</code>
-      <code class="correction-rule">ℓ̂ ≠ y : &nbsp; M<sub>y</sub> ← M<sub>y</sub> + ηh &nbsp;;&nbsp; M<sub>ℓ̂</sub> ← M<sub>ℓ̂</sub> − ηh</code>
+      <small>2 · BUILD AND QUERY THE MEMORY</small>
+      <code>M<sub>y</sub> ← M<sub>y</sub> + h<sub>i,t</sub></code>
+      <code>ℓ̂ = arg max<sub>ℓ∈C<sub>G</sub></sub> cos(h<sub>i,t</sub>, M<sub>ℓ</sub>)</code>
+      <p>y = observed next Location · recall by similarity</p>
     </div>
   </div>
-  <p class="next-edge-takeaway"><strong>The graph defines C<sub>G</sub>, the possible next visits.<br/></strong> Associative Memory updates M<sub>ℓ</sub> and ranks the next edge, without backpropagating through <i>φ</i>.</p>
+  <p class="next-edge-takeaway"><strong>Learned-representation ML updates the encoder.</strong> HDC keeps <i>φ</i> fixed and builds memory with simple vector operations.</p>
 </div>
 
-<!--
-Speaker notes:
-- This is a thought experiment and is not implemented in the repository.
-- Training requires observed VISITED edges with timestamps or ordinal positions, potentially across many people.
-- The prediction task is graph-constrained multiclass classification: the graph supplies the eligible destination set C_G(i,t), and HDC ranks those candidates.
-- F_(i,t-j) binds person, VISITED role, and a previously visited location into one fact hypervector. Permutation rho^j assigns that fact a position in the recent visit sequence.
-- h_(i,t) bundles the current location's multimodal evidence E(L_t) and the ordered recent VISITED facts. The encoder phi stays fixed in this prototype-style formulation.
-- Associative Memory is the standard HDC component that stores class prototypes. Here, every possible next destination l is a class, and M_l is the bundled memory of graph contexts that were followed by that destination.
-- Inference chooses the destination prototype with maximum cosine similarity, restricted to graph-valid candidates.
-- The final line shows an optional error-driven retraining rule used by HDC classifiers: add the context to the true destination memory and subtract it from the incorrectly predicted memory.
-- The contrast with typical end-to-end deep learning is where adaptation happens: gradient descent changes encoder parameters theta; this formulation maintains distributed class memories M_l while phi remains fixed.
-- Paper connection: Colonnese et al., “Hyperdimensional Computing for ADHD Classification using EEG Signals,” arXiv:2501.05186v1, Section IV-D. Their classes are ADHD and Control; this slide makes the next location the class instead.
-- Notation: × is binding, + is bundling, rho is a fixed positional permutation, E(L_t) is multimodal location evidence, and C_G is the graph-constrained candidate set.
--->
-
 <style>
-.slidev-layout.next-edge-slide{padding:88px 84px 38px}.next-edge-content h1{margin:10px 0 5px;font-size:40px;line-height:1.08;letter-spacing:-.025em}.next-edge-content>.lede{margin:0;color:rgba(240,231,220,.86);font-size:20px}.next-edge-visual{display:grid;grid-template-columns:300px 43px 205px 43px 1fr;gap:11px;align-items:stretch;height:224px;margin-top:17px}.graph-context-panel,.context-hv-panel,.associative-memory-panel{border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.78)}.graph-context-panel{padding:13px 14px}.graph-context-panel>small,.context-hv-panel>small{display:block;color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.1em}.graph-context-panel>small i,.context-hv-panel>small i{font-family:'Geist Mono',ui-monospace,monospace}.graph-context-panel svg{display:block;width:100%;height:112px;margin-top:1px}.next-node-type{fill:rgba(240,231,220,.58);font:9px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}.next-node-name{fill:#f0e7dc;font:700 12px 'Geist',sans-serif;text-anchor:middle}.next-edge-label{fill:#ff9e80;font:700 7px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}.next-evidence-label{fill:rgba(240,231,220,.52);font:9px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}.recent-visits{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:7px;margin-top:2px}.recent-visits>span{padding:7px 8px;border:1px solid rgba(162,140,255,.28);border-radius:7px;background:rgba(162,140,255,.04)}.recent-visits small,.recent-visits b{display:block}.recent-visits small{color:#b8aaff;font:9px 'Geist Mono',ui-monospace,monospace}.recent-visits b{margin-top:3px;color:rgba(240,231,220,.8);font-size:11px}.recent-visits>i{color:rgba(240,231,220,.4);font-style:normal;text-align:center}.story-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.story-arrow span{color:rgba(240,231,220,.48);font:9px 'Geist Mono',ui-monospace,monospace;text-transform:uppercase}.story-arrow b{color:var(--accent);font-size:28px}.context-hv-panel{display:flex;flex-direction:column;justify-content:center;padding:17px 18px;text-align:center;border-color:rgba(255,115,74,.42);background:radial-gradient(circle at 50% 45%,rgba(255,115,74,.1),rgba(15,13,11,.82) 65%)}.context-hv-panel>strong{margin-top:8px;color:var(--fg);font:700 29px 'Geist Mono',ui-monospace,monospace}.context-hv-stripe{height:34px;margin-top:12px;border-radius:5px;background-image:linear-gradient(90deg,#ff9e80 0 11%,#625d58 11% 27%,#a28cff 27% 42%,#625d58 42% 58%,#41b6ff 58% 73%,#625d58 73% 87%,#ff9e80 87%)}.operation-tags{display:flex;justify-content:center;gap:5px;margin-top:11px}.operation-tags span{padding:4px 5px;border:1px solid rgba(255,115,74,.24);border-radius:5px;color:rgba(240,231,220,.68);font:8px 'Geist Mono',ui-monospace,monospace}.context-hv-panel p{margin:9px 0 0;color:rgba(240,231,220,.5);font-size:10px}.associative-memory-panel{padding:13px 15px;border-color:rgba(162,140,255,.38);background:linear-gradient(180deg,rgba(162,140,255,.055),rgba(15,13,11,.8))}.memory-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}.memory-heading span{color:#b8aaff;font-size:10px;font-weight:750;letter-spacing:.1em}.memory-heading small{color:rgba(240,231,220,.5);font-size:9px}.prototype-row{display:grid;grid-template-columns:39px 1fr 105px;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(240,231,220,.06)}.next-edge-slide code{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}.prototype-row code{color:#c2b7ff!important;font:700 13px 'Geist Mono',ui-monospace,monospace}.prototype-row>span{color:rgba(240,231,220,.65);font-size:10px;text-align:right}.prototype-stripe{display:block;height:18px;border-radius:4px}.prototype-stripe.p1{background-image:linear-gradient(90deg,#a28cff 0 15%,#5f5a56 15% 35%,#ff9e80 35% 51%,#5f5a56 51% 73%,#41b6ff 73% 89%,#5f5a56 89%)}.prototype-stripe.p2{background-image:linear-gradient(90deg,#5f5a56 0 13%,#41b6ff 13% 31%,#5f5a56 31% 47%,#a28cff 47% 67%,#5f5a56 67% 84%,#ff9e80 84%)}.prototype-stripe.p3{background-image:linear-gradient(90deg,#ff9e80 0 17%,#5f5a56 17% 29%,#a28cff 29% 48%,#5f5a56 48% 66%,#41b6ff 66% 78%,#5f5a56 78%)}.predicted-edge{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:9px;margin-top:9px;padding:9px 11px;border:1px solid rgba(255,115,74,.32);border-radius:8px;background:rgba(255,115,74,.055);font-family:'Geist Mono',ui-monospace,monospace}.predicted-edge span,.predicted-edge strong{color:var(--fg);font-size:13px}.predicted-edge b{color:var(--accent-soft);font-size:10px;text-align:center}.predicted-edge strong{color:var(--accent-soft);font-size:17px}.next-edge-math{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:148px;margin-top:18px}.context-math-block,.memory-math-block{display:flex;flex-direction:column;justify-content:center;padding:14px 16px;border-left:2px solid var(--accent);background:rgba(255,115,74,.035)}.memory-math-block{border-left-color:#a28cff;background:rgba(162,140,255,.035)}.next-edge-math small{margin-bottom:7px;color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.1em}.memory-math-block small{color:#b8aaff}.next-edge-math code{display:block;color:rgba(240,231,220,.88)!important;font:15px/1.5 'Geist Mono',ui-monospace,monospace;white-space:nowrap}.context-math-block code:last-child{font-size:14px}.memory-math-block code{font-size:14px}.memory-math-block .correction-rule{margin-top:5px;color:#c2b7ff!important;font-size:12.5px}.next-edge-math sub,.next-edge-math sup,.predicted-edge sub,.context-hv-panel sub,.prototype-row sub,.next-edge-takeaway sub{font-size:.7em}.next-edge-takeaway{margin:18px 0 0;color:rgba(240,231,220,.9);font-size:18px;font-weight:500;text-align:center}.next-edge-takeaway strong{color:var(--accent-soft)}.next-edge-takeaway i{color:#b8aaff;font-family:'Geist Mono',ui-monospace,monospace}
+.slidev-layout.next-edge-slide{padding:88px 84px 38px}.next-edge-content h1{margin:10px 0 5px;font-size:40px;line-height:1.08;letter-spacing:-.025em}.next-edge-content>.lede{margin:0;color:rgba(240,231,220,.86);font-size:20px}.next-edge-visual{display:grid;grid-template-columns:300px 43px 205px 43px 1fr;gap:11px;align-items:stretch;height:224px;margin-top:17px}.graph-context-panel,.context-hv-panel,.associative-memory-panel{border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.78)}.graph-context-panel{padding:13px 14px}.graph-context-panel>small,.context-hv-panel>small{display:block;color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.1em}.graph-context-panel>small i,.context-hv-panel>small i{font-family:'Geist Mono',ui-monospace,monospace}.graph-context-panel svg{display:block;width:100%;height:112px;margin-top:1px}.next-node-type{fill:rgba(240,231,220,.58);font:9px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}.next-node-name{fill:#f0e7dc;font:700 12px 'Geist',sans-serif;text-anchor:middle}.next-edge-label{fill:#ff9e80;font:700 7px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}.next-evidence-label{fill:rgba(240,231,220,.52);font:9px 'Geist Mono',ui-monospace,monospace;text-anchor:middle}.recent-visits{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:7px;margin-top:2px}.recent-visits>span{padding:7px 8px;border:1px solid rgba(162,140,255,.28);border-radius:7px;background:rgba(162,140,255,.04)}.recent-visits small,.recent-visits b{display:block}.recent-visits small{color:#b8aaff;font:9px 'Geist Mono',ui-monospace,monospace}.recent-visits b{margin-top:3px;color:rgba(240,231,220,.8);font-size:11px}.recent-visits>i{color:rgba(240,231,220,.4);font-style:normal;text-align:center}.story-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.story-arrow span{color:rgba(240,231,220,.48);font:9px 'Geist Mono',ui-monospace,monospace;text-transform:uppercase}.story-arrow b{color:var(--accent);font-size:28px}.context-hv-panel{display:flex;flex-direction:column;justify-content:center;padding:17px 18px;text-align:center;border-color:rgba(255,115,74,.42);background:radial-gradient(circle at 50% 45%,rgba(255,115,74,.1),rgba(15,13,11,.82) 65%)}.context-hv-panel>strong{margin-top:8px;color:var(--fg);font:700 29px 'Geist Mono',ui-monospace,monospace}.context-hv-stripe{height:34px;margin-top:12px;border-radius:5px;background-image:linear-gradient(90deg,#ff9e80 0 11%,#625d58 11% 27%,#a28cff 27% 42%,#625d58 42% 58%,#41b6ff 58% 73%,#625d58 73% 87%,#ff9e80 87%)}.operation-tags{display:flex;justify-content:center;gap:5px;margin-top:11px}.operation-tags span{padding:4px 5px;border:1px solid rgba(255,115,74,.24);border-radius:5px;color:rgba(240,231,220,.68);font:8px 'Geist Mono',ui-monospace,monospace}.context-hv-panel p{margin:9px 0 0;color:rgba(240,231,220,.5);font-size:10px}.associative-memory-panel{padding:13px 15px;border-color:rgba(162,140,255,.38);background:linear-gradient(180deg,rgba(162,140,255,.055),rgba(15,13,11,.8))}.memory-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}.memory-heading span{color:#b8aaff;font-size:10px;font-weight:750;letter-spacing:.1em}.memory-heading small{color:rgba(240,231,220,.5);font-size:9px}.prototype-row{display:grid;grid-template-columns:39px 1fr 105px;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(240,231,220,.06)}.next-edge-slide code{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}.prototype-row code{color:#c2b7ff!important;font:700 13px 'Geist Mono',ui-monospace,monospace}.prototype-row>span{color:rgba(240,231,220,.65);font-size:10px;text-align:right}.prototype-stripe{display:block;height:18px;border-radius:4px}.prototype-stripe.p1{background-image:linear-gradient(90deg,#a28cff 0 15%,#5f5a56 15% 35%,#ff9e80 35% 51%,#5f5a56 51% 73%,#41b6ff 73% 89%,#5f5a56 89%)}.prototype-stripe.p2{background-image:linear-gradient(90deg,#5f5a56 0 13%,#41b6ff 13% 31%,#5f5a56 31% 47%,#a28cff 47% 67%,#5f5a56 67% 84%,#ff9e80 84%)}.prototype-stripe.p3{background-image:linear-gradient(90deg,#ff9e80 0 17%,#5f5a56 17% 29%,#a28cff 29% 48%,#5f5a56 48% 66%,#41b6ff 66% 78%,#5f5a56 78%)}.predicted-edge{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:9px;margin-top:9px;padding:9px 11px;border:1px solid rgba(255,115,74,.32);border-radius:8px;background:rgba(255,115,74,.055);font-family:'Geist Mono',ui-monospace,monospace}.predicted-edge span,.predicted-edge strong{color:var(--fg);font-size:13px}.predicted-edge b{color:var(--accent-soft);font-size:10px;text-align:center}.predicted-edge strong{color:var(--accent-soft);font-size:17px}.next-edge-math{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:148px;margin-top:18px}.context-math-block,.memory-math-block{display:flex;flex-direction:column;justify-content:center;padding:14px 16px;border-left:2px solid var(--accent);background:rgba(255,115,74,.035)}.memory-math-block{border-left-color:#a28cff;background:rgba(162,140,255,.035)}.next-edge-math small{margin-bottom:7px;color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.1em}.memory-math-block small{color:#b8aaff}.next-edge-math code{display:block;color:rgba(240,231,220,.88)!important;font:15px/1.5 'Geist Mono',ui-monospace,monospace;white-space:nowrap}.context-math-block code:last-child{font-size:14px}.memory-math-block code{font-size:14px}.next-edge-math p{margin:7px 0 0;color:rgba(240,231,220,.56);font-size:12px;text-align:center}.next-edge-math sub,.next-edge-math sup,.predicted-edge sub,.context-hv-panel sub,.prototype-row sub,.next-edge-takeaway sub{font-size:.7em}.next-edge-takeaway{margin:18px 0 0;color:rgba(240,231,220,.9);font-size:18px;font-weight:500;text-align:center}.next-edge-takeaway strong{color:var(--accent-soft)}.next-edge-takeaway i{color:#b8aaff;font-family:'Geist Mono',ui-monospace,monospace}
 </style>
+
+<!--
+We'll end with some food for thought for the machine learning folks in the audience. Could the same algebra for retrieving similar graph entities work for predicting graph relationships?
+
+In HDC literature, a prototype is a memory for a class, built by bundling encoded examples with the same label. Think of it as centroid-like: recurring structure reinforces, while one-off details fade.
+
+Here, each possible next Location is a class. Before predicting, we gather everything currently known about Maya: her identity, the VISITED relationship, the ordered sequence of recent visits, and the current multimodal evidence. The fixed encoder combines these inputs into one hypervector, h. If Maya visits Pike Place next, h becomes a training example for the Pike Place class, so we bundle it into Pike Place’s prototype hypervector. Repeated across many histories, that prototype summarizes the patterns that typically precede a visit to Pike Place.
+
+This makes this more like associative *memory*: a new situation *recalls* the outcome associated with similar past situations. We compare its hypervector with the destination prototypes and choose the closest match.
+
+It's interesting how different this is from traditional machine learning. A neural network normally learns by changing encoder weights, so the representation itself is learned. In HDC, the representation stays fixed, but learning accumulates the experience via binding and bundling into a class memory. We can then use cosine similarity to recall the closest memory. No backpropagation needed.
+
+The graph constraints the valid destinations, and HDC chooses among them. These are some interesting ideas, if implemented, shows how HD-based retrieval could power a lightweight online learning algorithm over graph-like events.
+-->
 
 ---
 layout: default
@@ -2369,15 +2421,14 @@ class: reproduce-slide
   <p class="closing-note">Questions? Come find us after the talk!</p>
 </div>
 
-<!--
-Speaker notes:
-- Keep this closing slide light: the full-width pipeline recaps the implementation without repeating path results already shown earlier.
-- Point the audience to the public repository for code, setup, and the complete demo.
-- Invite the audience to follow LanceDB using the two icon-led social links.
--->
-
 <style>
 .slidev-layout.reproduce-slide{padding:88px 84px 44px}.reproduce-content h1{margin:10px 0 6px;font-size:44px;line-height:1.08;letter-spacing:-.025em}.reproduce-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:21px}.run-pipeline-full{display:grid;grid-template-columns:1fr 42px 1fr 42px 1fr 42px 1fr 42px 1fr;align-items:stretch;width:100%;height:144px;margin-top:30px;padding:16px 20px;border-top:1px solid var(--border-strong);border-bottom:1px solid var(--border-strong);background:linear-gradient(90deg,rgba(255,115,74,.025),rgba(255,115,74,.07),rgba(255,115,74,.025))}.run-pipeline-full>i{display:grid;place-items:center;color:var(--accent);font-size:30px;font-style:normal}.pipeline-stage{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.pipeline-stage b{display:grid;place-items:center;width:39px;height:39px;border:1px solid rgba(255,115,74,.38);border-radius:50%;background:rgba(255,115,74,.09);color:var(--accent-soft);font:700 13px 'Geist Mono',ui-monospace,monospace}.pipeline-stage span{margin-top:13px;color:var(--fg);font-size:17px;font-weight:650}.closing-links{display:grid;grid-template-columns:1.2fr .8fr;gap:46px;align-items:center;margin-top:42px}.repo-link{display:flex;align-items:center;gap:22px;min-width:0;padding:8px 0;color:inherit;text-decoration:none!important}.repo-icon{flex:0 0 auto;width:62px;height:62px;color:var(--accent-soft)}.repo-link>span{display:flex;flex-direction:column;min-width:0}.repo-link small,.follow-block>small{color:rgba(240,231,220,.5);font-size:11px;font-weight:750;letter-spacing:.11em}.repo-link strong{margin-top:8px;color:var(--fg);font:21px 'Geist Mono',ui-monospace,monospace}.repo-link em{margin-top:8px;color:rgba(240,231,220,.62);font-size:14px;font-style:normal}.follow-block{padding-left:40px;border-left:1px solid var(--border-strong)}.social-row{display:flex;align-items:center;gap:18px;margin-top:14px}.social-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border-strong);border-radius:8px;background:rgba(15,13,11,.72);color:var(--fg);text-decoration:none!important}.social-icon{width:25px;height:25px}.linkedin-icon{color:#0a66c2}.x-icon{color:var(--fg)}.social-link strong{font:16px 'Geist Mono',ui-monospace,monospace}.follow-block p{margin:13px 0 0;color:rgba(240,231,220,.62);font-size:14px;line-height:1.4}.closing-note{margin:38px 0 0;color:rgba(240,231,220,.92);font-size:22px;font-weight:550;text-align:center}
 </style>
 
-<!-- DECK_EOF -->
+<!--
+I'll close with three thoughts. First, graphs do not have to stop at links to multimodal data. Lance lets us keep the graph, vectors, and original evidence together. Second, HDC gives us an algebra for combining that evidence with graph structure, so similarity can respect roles, direction, and history. Third, associative memory hints at what could come next: lightweight learning over graph events with a fixed representation.
+
+The complete demo is open source at the repository here, so you can work with actual TorchHD code and generate your own hypervectors for your own problem domains, hopefully with LanceDB in the mix. The whole tool chain shown here is open source.
+
+HDC literature is typically very research-focused, so I hope this talk gave you a more practical understanding of these concepts. I only scratched the surface here, but I'll be working more on these kinds of problems with David Hughes, who is far deeper into these topics than I am.  If any of these ideas sparked more questions, please come find both David and me after the talk. We'd love to chat.
+-->
