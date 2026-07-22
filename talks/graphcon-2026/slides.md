@@ -43,6 +43,185 @@ Nice. Hopefully this talk is interesting. I'm Prashanth, I work as an AI Enginee
 
 ---
 layout: default
+class: city-choice-slide
+---
+
+<div class="city-choice-content">
+  <Eyebrow>A fuzzy question</Eyebrow>
+  <h1>Which city fits this query?</h1>
+  <p class="city-query"><em>"Cities on the Pacific coast with mountains nearby.”</em></p>
+  <div class="city-image-grid">
+    <div class="city-image-card">
+      <img src="./assets/seattle.jpg" alt="Seattle skyline and Mount Rainier" />
+      <span class="candidate-label">CANDIDATE 01</span>
+      <span class="city-helper">Seattle, WA</span>
+    </div>
+    <div class="city-image-card">
+      <img src="./assets/salt-lake-city.jpg" alt="Salt Lake City skyline and mountains" />
+      <span class="candidate-label">CANDIDATE 02</span>
+      <span class="city-helper">Salt Lake City, UT</span>
+    </div>
+    <div class="city-image-card">
+      <img src="./assets/nyc.jpg" alt="New York City skyline" />
+      <span class="candidate-label">CANDIDATE 03</span>
+      <span class="city-helper">New York City, NY</span>
+    </div>
+  </div>
+  <div v-click class="city-reveal-grid">
+    <div class="city-reveal">
+      <div class="feature-chips"><span>mountains</span><span>waterfront</span><span>pacific coast</span></div>
+    </div>
+    <div class="city-reveal">
+      <div class="feature-chips"><span>mountains</span><span>nature access</span><span>inland</span></div>
+    </div>
+    <div class="city-reveal">
+      <div class="feature-chips"><span>dense skyline</span><span>riverfront</span><span>urban energy</span></div>
+    </div>
+  </div>
+  <p class="city-prompt">What evidence did your mind combine before you chose?</p>
+</div>
+
+<style>
+.slidev-layout.city-choice-slide {
+  padding: 88px 84px 46px;
+}
+
+.city-choice-content h1 {
+  margin: 10px 0 5px;
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.city-query {
+  margin: 0;
+  color: rgba(240, 231, 220, 0.86);
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.city-image-grid,
+.city-reveal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.city-image-grid {
+  height: 236px;
+  margin-top: 20px;
+}
+
+.city-image-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--bg-deep);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.city-image-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 13, 11, 0.05), rgba(15, 13, 11, 0.30));
+  pointer-events: none;
+}
+
+.city-image-card img {
+  width: 100%;
+  height: calc(100% - 34px);
+  object-fit: cover;
+  filter: saturate(0.82) contrast(1.04);
+}
+
+.city-helper {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 13px;
+  border-top: 1px solid var(--border);
+  background: rgba(15, 13, 11, 0.96);
+  color: rgba(240, 231, 220, 0.88);
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+.candidate-label {
+  position: absolute;
+  z-index: 2;
+  top: 13px;
+  left: 14px;
+  border: 1px solid rgba(255, 115, 74, 0.30);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(15, 13, 11, 0.78);
+  color: var(--accent-soft);
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.13em;
+}
+
+.city-reveal-grid {
+  margin-top: 10px;
+}
+
+.city-reveal {
+  min-height: 50px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 8px 12px;
+  background: rgba(32, 27, 22, 0.70);
+}
+
+.feature-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 0;
+}
+
+.feature-chips span {
+  border-radius: 999px;
+  padding: 3px 7px;
+  background: rgba(255, 115, 74, 0.09);
+  color: rgba(240, 231, 220, 0.72);
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 14px;
+}
+
+.city-prompt {
+  margin: 16px 0 0;
+  color: rgba(240, 231, 220, 0.96);
+  font-size: 24px;
+  font-weight: 550;
+  text-align: center;
+}
+</style>
+
+<!--
+Let's start with a quick question. We have three cities: Seattle, Salt Lake City, and New York. Which one fits “Cities on the Pacific coast with mountains nearby?”
+
+It shouldn't take more than a second to choose between these three options.
+
+Hopefully, most of us chose Seattle. But notice what happened before you answered. Your mind combined multiple kinds of evidence. You probably didn't match one exact phrase against one stored field. We know Seattle has mountains nearby, a waterfront, and a Pacific coast location. Even if we didn't have every fact memorized, some of that evidence is visible in the image. Those signals reinforce one another.
+
+Salt Lake City is an interesting candidate because it isn't random noise. It strongly matches mountains and access to nature, but it is inland. New York has a dense skyline and plenty of waterfront, but it does not fit the Pacific-and-mountains combination. So there are degrees of association here.
+
+This distinction will matter later. We expect Seattle to rank highest, but we also want our representation to preserve why Salt Lake City is a plausible partial match.
+
+What your mind just did was combine several individually weak but compatible signals. That is the pattern we want to reproduce for agents. Let's make it explicit before we add the graph.
+-->
+
+---
+layout: default
 class: association-slide
 ---
 
@@ -404,199 +583,13 @@ class: association-slide
 </style>
 
 <!--
-Before we talk about graphs, vectors, or HDC, I want to start with something we, as humans, do almost automatically: we associate.
+That quick choice demonstrates something humans do almost automatically: we associate rather than search for one exact match.
 
-Say I ask you the question "which persons visited cities on the pacific coast with mountains nearby?". To answer this, your mind begins joining those pieces together. You don't approach it like a database, in terms of schemas.
+You used partial signals from the images, your memory of each place, and the language in the query. You connected those signals even though no single stored field gave you the complete answer.
 
-You use partial signals from an image, likely a memory of the place, and the language in the query, and you form a useful assoiation between all the connected entities.
+Now let's extend the question: “Which persons visited cities on the Pacific coast with mountains nearby?” The city choice is still fuzzy, but we have added one factual graph relationship: a person VISITED a location.
 
-So let's keep this example in mind: “Persons who visited cities on the Pacific coast
-with mountains nearby.” It sounds simple, but it's a query that combines
-visual evidence, geographic meaning, and one factual graph relationship.
--->
-
----
-layout: default
-class: city-choice-slide
----
-
-<div class="city-choice-content">
-  <Eyebrow>A fuzzy question</Eyebrow>
-  <h1>Which city fits this query?</h1>
-  <p class="city-query"><em>"Cities on the Pacific coast with mountains nearby.”</em></p>
-  <div class="city-image-grid">
-    <div class="city-image-card">
-      <img src="./assets/seattle.jpg" alt="Seattle skyline and Mount Rainier" />
-      <span class="candidate-label">CANDIDATE 01</span>
-      <span class="city-helper">Seattle, WA</span>
-    </div>
-    <div class="city-image-card">
-      <img src="./assets/salt-lake-city.jpg" alt="Salt Lake City skyline and mountains" />
-      <span class="candidate-label">CANDIDATE 02</span>
-      <span class="city-helper">Salt Lake City, UT</span>
-    </div>
-    <div class="city-image-card">
-      <img src="./assets/nyc.jpg" alt="New York City skyline" />
-      <span class="candidate-label">CANDIDATE 03</span>
-      <span class="city-helper">New York City, NY</span>
-    </div>
-  </div>
-  <div v-click class="city-reveal-grid">
-    <div class="city-reveal">
-      <div class="feature-chips"><span>mountains</span><span>waterfront</span><span>pacific coast</span></div>
-    </div>
-    <div class="city-reveal">
-      <div class="feature-chips"><span>mountains</span><span>nature access</span><span>inland</span></div>
-    </div>
-    <div class="city-reveal">
-      <div class="feature-chips"><span>dense skyline</span><span>riverfront</span><span>urban energy</span></div>
-    </div>
-  </div>
-  <p class="city-prompt">What evidence did your mind combine before you chose?</p>
-</div>
-
-<style>
-.slidev-layout.city-choice-slide {
-  padding: 88px 84px 46px;
-}
-
-.city-choice-content h1 {
-  margin: 10px 0 5px;
-  font-size: 40px;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
-}
-
-.city-query {
-  margin: 0;
-  color: rgba(240, 231, 220, 0.86);
-  font-size: 19px;
-  line-height: 1.4;
-}
-
-.city-image-grid,
-.city-reveal-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.city-image-grid {
-  height: 236px;
-  margin-top: 20px;
-}
-
-.city-image-card {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border-strong);
-  border-radius: 14px;
-  background: var(--bg-deep);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
-}
-
-.city-image-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(15, 13, 11, 0.05), rgba(15, 13, 11, 0.30));
-  pointer-events: none;
-}
-
-.city-image-card img {
-  width: 100%;
-  height: calc(100% - 34px);
-  object-fit: cover;
-  filter: saturate(0.82) contrast(1.04);
-}
-
-.city-helper {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  height: 34px;
-  padding: 0 13px;
-  border-top: 1px solid var(--border);
-  background: rgba(15, 13, 11, 0.96);
-  color: rgba(240, 231, 220, 0.88);
-  font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 16px;
-  letter-spacing: 0.04em;
-}
-
-.candidate-label {
-  position: absolute;
-  z-index: 2;
-  top: 13px;
-  left: 14px;
-  border: 1px solid rgba(255, 115, 74, 0.30);
-  border-radius: 999px;
-  padding: 5px 9px;
-  background: rgba(15, 13, 11, 0.78);
-  color: var(--accent-soft);
-  font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 12px;
-  letter-spacing: 0.13em;
-}
-
-.city-reveal-grid {
-  margin-top: 10px;
-}
-
-.city-reveal {
-  min-height: 50px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 8px 12px;
-  background: rgba(32, 27, 22, 0.70);
-}
-
-.feature-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 0;
-}
-
-.feature-chips span {
-  border-radius: 999px;
-  padding: 3px 7px;
-  background: rgba(255, 115, 74, 0.09);
-  color: rgba(240, 231, 220, 0.72);
-  font-family: 'Geist Mono', ui-monospace, monospace;
-  font-size: 14px;
-}
-
-.city-prompt {
-  margin: 16px 0 0;
-  color: rgba(240, 231, 220, 0.96);
-  font-size: 24px;
-  font-weight: 550;
-  text-align: center;
-}
-</style>
-
-<!--
-Let's extend that a bit more: We have three cities, Seattle, Salt Lake City, and New York. We're looking to retrieve on the following: “Cities on the Pacific coast with mountains nearby.”
-
-It shouldn't take more than a second to come up with the answer, between these three options.
-
-Hopefully, most of us chose Seattle. But notice what happened in your head before
-you answered. Your mind combined multiple kinds of evidence. You probably didn't match one exact phrase against one stored
-field. We intuitively know that Seattle has mountains nearby, it has a waterfront, and it is on the Pacific coast. Even if we didn't have those facts memorized, we can observe that from the image evidence. Eac of these signals reinforce, or compliment one another.
-
-In this example, Salt Lake City is an interesting addition, because it't not random noise. It does strongly matches mountains and access to nature, but it is inland. New York has a dense
-skyline and plenty of waterfront, but it does not fit the Pacific-and-mountains combination. So there are degrees of association here.
-
-This distinction will matter later. If we had a dataset of these three cities, we fully expect Seattle to rank highly, but we'd also want the representation we stored, to preserve why Salt Lake City is a plausible partial match.
-
-We looked at this from a human perspective, but nowadays, it's agents doing this kind of search and retrieval for us on a daily basis. Just like humans, it can be very powerful if we enable agents to construct the answer from several individually weak but compatible signals.
-
-Next, let's look at the small graph and multimodal dataset we will use to reproduce that behavior and introduce the idea of associative search.
+That is the pattern for the rest of the talk. Associative search can propose which city fits the description; the graph can connect that city to people and verify what we know. Next, let's look at the small graph and multimodal dataset we'll use to reproduce it.
 -->
 
 ---
