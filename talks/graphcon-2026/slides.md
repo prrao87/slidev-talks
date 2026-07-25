@@ -2066,7 +2066,7 @@ class: receipt-slide
 <div class="receipt-content">
   <Eyebrow>Why multimodal knowledge graphs matter</Eyebrow>
   <h1>Keep the data's source modality.<br>Derive the representation each task needs.</h1>
-  <p class="lede">Medical scans, satellite imagery, maps, and sensor streams contain details that structured properties cannot fully capture.</p>
+  <p class="lede">Medical scans, satellite imagery, physical machinery and robot traces contain details that structured properties cannot fully capture.</p>
   <div class="receipt-enrichment">
     <div class="media-source-card">
       <small>MULTIMODAL SOURCE</small>
