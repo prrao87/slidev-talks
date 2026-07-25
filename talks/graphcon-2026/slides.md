@@ -583,11 +583,11 @@ class: association-slide
 </style>
 
 <!--
-That subconscious thought process demonstrates something humans do intuitively: we associate rather than search for an exact match.
+That subconscious thought process demonstrates something we humans do intuitively: we associate, rather than looking for an exact match.
 
-Now let's extend the question: “Which persons visited cities on the Pacific coast with mountains nearby?” The city choice is still fuzzy, but we have added one factual graph relationship: a person VISITED a location.
+Let's extend the previous question: “Which *persons* visited cities on the Pacific coast with mountains nearby?” We added one factual graph relationship: a person VISITED a location.
 
-Again, our minds construct an image of a location that's a city, bringing to mind the image of a skyline, which is a characteristic feature of a city. We also think of the notion of geography - The Pacific ocean is on the west coast, and not all cities there have mountains. Before the word "Seattle" comes to mind, these associations are all taking place beforehand.
+Our minds construct an image of a location that's a city, bringing to mind the image of a skyline, which is a characteristic feature of a city. We also think of the notion of geography - The Pacific ocean is on the west coast, and not all cities there have mountains. Before the word "Seattle" comes to mind, these associations are all taking place beforehand.
 
 This is the essence of associative search: rather than directly looking for a city that fits the description, the concepts can connect together in a way that that city, and to the people who visited it. The natural way to think about this kind of data is a graph.
 -->
@@ -736,7 +736,7 @@ class: dataset-schema-slide
 </style>
 
 <!--
-Let's construct a small graph dataset that answers this kind of question. We have four persons, three city locations, and four recorded visits of those persons to those locations. Maya and Robby visited Seattle, Elena visited Salt Lake City, and Andre visited New York.
+Let's concoct a small property graph dataset that answers this kind of question. We have four persons, three city locations, and four recorded visits of those persons to those locations. Maya and Robby visited Seattle, Elena visited Salt Lake City, and Andre visited New York.
 
 The property graph on the right should look quite familiar:
 a Person connected to a Location by a Visited relationship. The gray Company
@@ -951,14 +951,14 @@ class: schema-gap-slide
 </style>
 
 <!--
-There's a fundamental problem in knowledge graphs: the open world assumption. Data that exists in the real world is always missing from the graph. Just because the graph doesn't capture it, it doesn't mean that the data doesn't exist - we just don't know it yet.
+There's a fundamental issue with knowledge graphs: the open world assumption. Data that exists in the real world is always missing from the graph. Just because the graph doesn't capture it, it doesn't mean that the data doesn't exist - we just don't know it yet.
 
 The Cypher query on the right shows how we start with a Person, follow
 a Visited relationship, match on features, and arrive at a Location. The traversal isn’t the problem. In this case, the designer of the graph never decided to store the features "pacific coast" or "mountains". So if these aren't explicitly named, we don't get a match. A MATCH query in Cypher is :all or nothing", especially if you have filters involved.
 
-We could, of course, keep adding more and more features as properties every time a new question appears. But that becomes brittle and hard to manage very quickly, especially when the evidence is already sitting in images or other places, and users can directly query those sources in many different ways.
+We could, of course, keep adding more and more features as properties every time a new question appears. But that becomes brittle and hard to manage very quickly, especially when the evidence is fragmented across different sources.
 
-So it's not that graphs + vector search over the properties can’t help answer fuzzy questions. Essentially, the GraphRAG pattern we've all gotten so familiar with. But even with vector search, we can only go so far as capturing the semantics of features in text or image properties that already exist.
+So it's not that graphs + traditional vector search over the properties can’t help answer fuzzy questions. This is essentially, the GraphRAG pattern we've all gotten so familiar with. But even with traditional vector search, we can only go so far as capturing the the semantics of text properties on nodes in the graph. The graph structure itself, is left to a graph database.
 -->
 
 ---
@@ -994,8 +994,7 @@ class: spaces-are-graphs-slide
 </style>
 
 <!--
-Let's now dive deeper into higher-dimensional geometries. As we know, a graph is a
-discrete representation of something we can also express in a continuous, very
+Let's now understand some fundamental intuitions about higher-dimensional geometries. As we know, a graph is a discrete representation of something we can also express in a continuous, very
 high-dimensional space.
 
 We start with a very familiar graph representation: a finite set of nodes and edges. The fuzzy manifold you see is essentially a 3D projection of a much higher-dimensional space that models the same graph data. And importantly, this isn’t just
@@ -1113,98 +1112,6 @@ Pentti Kanerva’s 2009 paper, “Hyperdimensional Computing,” is the foundati
 introduction and introduces the concepts of HDC. Kleyko and colleagues’ “Vector Symbolic Architectures as a Computing Framework for Emerging Hardware” gives a broader, more modern, practitioner lens.
 
 So that’s the basic loop: represent, compose, and retrieve.
--->
-
----
-layout: default
-class: hypervector-slide
----
-
-<div class="hypervector-content">
-  <Eyebrow>How are hypervectors generated?</Eyebrow>
-  <h1>Simplest way: <span>Build a codebook from domain vocabulary</span></h1>
-  <p class="lede">At setup time, a seeded random generator creates one 10,000-D vector per vocabulary token. After that, every known token resolves to its stored row.</p>
-  <div class="hv-story">
-    <section class="hv-story-card atomic-card">
-      <div class="hv-step-heading"><b>1</b><div><span>INITIALIZE ONCE</span><strong>Generate one random vector per token.</strong></div></div>
-      <div class="codebook-build">
-        <div class="feature-vocab">
-          <small>VOCABULARY TOKENS · V</small>
-          <span>mountains</span><span>waterfront</span><span>pacific_coast</span>
-        </div>
-        <div class="rng-step"><small>SEEDED<br/>RNG</small><b>→</b></div>
-        <div class="codebook-rows">
-          <small>STORED CODEBOOK · R</small>
-          <div><code>M</code><i class="seed-strip seed-a"></i></div>
-          <div><code>W</code><i class="seed-strip seed-b"></i></div>
-          <div><code>P</code><i class="seed-strip seed-c"></i></div>
-        </div>
-      </div>
-      <div class="atomic-math">
-        <code>R ∈ {−1,+1}<sup>|V| × 10,000</sup></code>
-        <strong>rows are ≈ orthogonal</strong>
-      </div>
-      <p class="atomic-caveat"><b>Random once at initialization.</b> Deterministic after that.</p>
-    </section>
-    <div class="hv-story-arrow" aria-hidden="true"><span>reuse</span><b>→</b></div>
-    <section class="hv-story-card lookup-card">
-      <div class="hv-step-heading"><b>2</b><div><span>LOOK UP WHEN NEEDED</span><strong>Resolve one token to its stored row.</strong></div></div>
-      <div class="codebook-lookup">
-        <div class="lookup-token"><small>INPUT TOKEN</small><strong>mountains</strong></div>
-        <b>→</b>
-        <div class="lookup-index"><small>CODEBOOK ROW</small><strong>i<sub>M</sub></strong></div>
-        <b>→</b>
-        <div class="lookup-vector"><small>ATOMIC HYPERVECTOR</small><div><code>M</code><i class="seed-strip seed-a"></i></div></div>
-      </div>
-      <div class="lookup-repeat">
-        <span>same token</span><b>→</b><span>same row</span><b>→</b><span>same vector</span>
-      </div>
-      <p class="lookup-boundary"><b>No composition yet.</b> Binding and bundling combine these atomic rows in the next slides.</p>
-    </section>
-  </div>
-  <p class="hv-takeaway">A codebook gives each known term a <strong>stable atomic hypervector.</strong><br/>Binding and bundling come next.</p>
-</div>
-
-<style>
-.slidev-layout.hypervector-slide{padding:88px 84px 38px}
-.hypervector-content h1{margin:10px 0 5px;font-size:40px;line-height:1.08;letter-spacing:-.025em}
-.hypervector-content h1 span{color:var(--accent-soft);font-style:italic}
-.hypervector-content>.lede{margin:0;color:rgba(240,231,220,.86);font-size:20px}
-.hv-story{display:grid;grid-template-columns:.88fr 54px 1.12fr;gap:12px;height:305px;margin-top:18px}
-.hv-story-card{border:1px solid var(--border-strong);border-radius:15px;background:rgba(15,13,11,.78);padding:17px 19px}
-.hv-step-heading{display:flex;align-items:center;gap:11px;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.hv-step-heading>b{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(255,115,74,.6);border-radius:50%;color:var(--accent-soft);font:700 14px 'Geist Mono',ui-monospace,monospace}
-.hv-step-heading div{display:flex;flex-direction:column;gap:2px}.hv-step-heading span{color:var(--accent-soft);font:700 10px 'Geist Mono',ui-monospace,monospace;letter-spacing:.1em}.hv-step-heading strong{color:var(--fg);font-size:16px}
-.codebook-build{display:grid;grid-template-columns:128px 44px 1fr;align-items:center;gap:7px;margin-top:12px}.rng-step{display:flex;flex-direction:column;align-items:center;gap:2px}.rng-step small{color:rgba(240,231,220,.48);font:8px/1.2 'Geist Mono',ui-monospace,monospace;text-align:center}.rng-step b{color:var(--accent);font-size:22px}.feature-vocab,.codebook-rows{display:flex;flex-direction:column;gap:5px}.feature-vocab small,.codebook-rows small{margin-bottom:1px;color:rgba(240,231,220,.48);font:9px 'Geist Mono',ui-monospace,monospace;letter-spacing:.07em}.feature-vocab span{padding:4px 6px;border:1px solid rgba(123,216,255,.22);border-radius:5px;background:rgba(55,168,215,.06);color:#8bdcff;font:10px 'Geist Mono',ui-monospace,monospace}.codebook-rows>div{display:grid;grid-template-columns:17px 1fr;align-items:center;gap:5px}.codebook-rows code{color:var(--accent-soft);font:700 10px 'Geist Mono',ui-monospace,monospace}.seed-strip{display:block;height:18px;border-radius:4px;background-size:27px 18px}.seed-a{background-image:linear-gradient(90deg,#ff9e80 0 17%,#5d554d 17% 32%,#ff9e80 32% 49%,#5d554d 49% 67%,#ff9e80 67% 82%,#5d554d 82%)}.seed-b{background-image:linear-gradient(90deg,#5d554d 0 12%,#ff9e80 12% 29%,#5d554d 29% 45%,#ff9e80 45% 63%,#5d554d 63% 76%,#ff9e80 76%)}.seed-c{background-image:linear-gradient(90deg,#ff9e80 0 9%,#5d554d 9% 26%,#ff9e80 26% 41%,#5d554d 41% 61%,#ff9e80 61% 88%,#5d554d 88%)}
-.atomic-math{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:11px 12px;border-radius:9px;background:rgba(55,168,215,.07);border:1px solid rgba(55,168,215,.18)}.atomic-math code{color:#8bdcff;font:13px 'Geist Mono',ui-monospace,monospace}.atomic-math sup{font-size:9px}.atomic-math strong{color:rgba(240,231,220,.82);font:12px 'Geist Mono',ui-monospace,monospace}.atomic-caveat{margin:11px 0 0;color:rgba(240,231,220,.62);font-size:13px;text-align:center}.atomic-caveat b{color:var(--accent-soft)}
-.hv-story-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--accent)}.hv-story-arrow span{color:rgba(240,231,220,.52);font:10px 'Geist Mono',ui-monospace,monospace;text-transform:uppercase;transform:rotate(-90deg);margin-bottom:14px}.hv-story-arrow b{font-size:34px}
-.codebook-lookup{display:grid;grid-template-columns:1.15fr 24px .72fr 24px 1.5fr;align-items:center;gap:8px;margin-top:20px}.codebook-lookup>div{min-width:0;padding:12px;border:1px solid var(--border);border-radius:9px;background:rgba(240,231,220,.025)}.codebook-lookup>b{color:var(--accent);font-size:20px;text-align:center}.codebook-lookup small{display:block;color:rgba(240,231,220,.48);font:8px 'Geist Mono',ui-monospace,monospace;letter-spacing:.08em}.lookup-token strong,.lookup-index strong{display:block;margin-top:7px;color:var(--fg);font:700 14px 'Geist Mono',ui-monospace,monospace}.lookup-index strong{color:#8bdcff;text-align:center}.lookup-vector>div{display:grid;grid-template-columns:18px 1fr;align-items:center;gap:7px;margin-top:7px}.lookup-vector code{color:var(--accent-soft);font:700 12px 'Geist Mono',ui-monospace,monospace}.lookup-vector .seed-strip{height:25px}.lookup-repeat{display:flex;align-items:center;justify-content:center;gap:11px;margin-top:20px;padding:10px;border:1px solid rgba(55,168,215,.22);border-radius:9px;background:rgba(55,168,215,.055)}.lookup-repeat span{color:rgba(240,231,220,.78);font:12px 'Geist Mono',ui-monospace,monospace}.lookup-repeat b{color:#8bdcff;font-size:17px}.lookup-boundary{margin:17px 4px 0;color:rgba(240,231,220,.65);font-size:14px;line-height:1.35;text-align:center}.lookup-boundary b{color:var(--accent-soft)}
-.hv-takeaway{margin:34px 0 0;color:rgba(240,231,220,.96);font-size:22px;font-weight:500;text-align:center}.hv-takeaway strong{color:var(--accent-soft)}
-.kanerva-link{display:block;width:max-content;margin:14px auto 0;color:rgba(240,231,220,.52);font:11px 'Geist Mono',ui-monospace,monospace;text-decoration:none;border-bottom:1px solid rgba(255,115,74,.28)}.kanerva-link:hover{color:var(--accent-soft);border-bottom-color:var(--accent)}
-</style>
-
-<!--
-How does encoding work, exactly? We need hypervectors for each of the entities and relationships in our domain. In this example, we walk through the Person, Location, and VISITED data, along with the extracted image features, to build a vocabulary. It includes
-roles like “feature,” values like “mountains,” and relationships like “VISITED.”
-
-This slide shows a simple starting point: creating a vocabulary of terms for the domain.
-Step one is the left side: initialize once. A seeded pseudorandom generator
-assigns each vocabulary token one arbitrary ten-thousand-dimensional pattern of
-plus ones and minus ones. You can think of that pattern as a long barcode. The
-coordinates are random-looking, but the fixed seed makes the assignment
-reproducible. The same vocabulary and seed produce the same matrix. We store those
-rows, along with a dictionary from each token to its row number, as the codebook.
-
-Step two is the right side: look up when needed. Once the vocabulary is initialized,
-we don’t generate another vector for a known token. When the encoder sees
-“mountains,” the dictionary points to row i-M and returns the stored vector M.
-Every later occurrence of “mountains” receives that same M. What's “random” is
-how the hypervector assignment is created upfront;  what's “deterministic” is every use after
-that.
-
-The key takeaway from this slide is that we need to define an encoder to turn a raw record into a hypervector.  A codebook is a very rudimentary way to encode data into hypervectors. It’s an
-easy place to begin with a discrete vocabulary because every step is transparent and inspectable.
-But in the real world, you'd build more advanced encoders can handle continuous values, sequences, structured inputs, or learned features. Those are directions for future talks and blog posts.
 -->
 
 ---
@@ -1506,22 +1413,22 @@ class: bundling-slide
     </div>
     <div class="bundle-node"><strong>⊕</strong><span>BUNDLE</span><small>superpose the associations</small></div>
     <div class="node-vector-output">
-      <small>LOCATION:SEATTLE · vibe_hv COLUMN</small>
-      <strong>The "Seattle hypervector"</strong>
+      <small>CONCEPTUAL LOCATION FEATURE BUNDLE</small>
+      <strong>One semantic component</strong>
       <i class="node-vector-stripe"></i>
       <div><span>mountains ✓</span><span>pacific_coast ✓</span></div>
-      <p>This column stores the bundled features used for similarity search.</p>
+      <p>Bundling preserves both contributions without increasing the vector width.</p>
     </div>
   </div>
   <div class="bundle-math-row">
-    <code>S<sub>Seattle</sub> = L<sub>mountains</sub> <b>⊕</b> L<sub>pacific_coast</sub> ⊕ …</code>
+    <code>B<sub>features</sub> = L<sub>mountains</sub> <b>⊕</b> L<sub>pacific_coast</sub> ⊕ …</code>
     <small>superposition of Location features</small>
   </div>
   <div class="feature-memory-row">
-    <span><b>REMOVE</b> S<sub>Seattle</sub> − L<sub>mountains</sub> = the remaining Location features</span>
-    <span><b>RESTORE</b> remaining features ⊕ L<sub>mountains</sub> = S<sub>Seattle</sub></span>
+    <span><b>REMOVE</b> B<sub>features</sub> − L<sub>mountains</sub> = the remaining features</span>
+    <span><b>RESTORE</b> remaining features ⊕ L<sub>mountains</sub> = B<sub>features</sub></span>
   </div>
-  <p class="operation-takeaway"><strong>From a graph perspective, bundling is what produces the "Location node" for Seattle: </strong> one hypervector that captures all its features</p>
+  <p class="operation-takeaway"><strong>Binding creates the associations; bundling combines them.</strong> Next, the encoder applies both operations to the complete Seattle node.</p>
 </div>
 
 <style>
@@ -1544,113 +1451,151 @@ hypervectors from the previous slide and add their matching positions. Each asso
 be counts such as minus two, zero, or plus two, but the vector is still has the same ten
 thousand dimensions.
 
-On the right, we can see how we can now get the hypervector thats represents the "vibe" of Seattle,
-because we combined all the features we had for it into one hypervector. Thinking through the graph lens, the "node" for the location Seattle is basically equivalent to the bound and bundled hypervector of all its associations and types.
-The hypervector gives us a combined, fuzzy description of Seattle in continuous vector space: mountains, Pacific coast, and the other features represented in our dataset.
+On the right, we have one conceptual semantic component: mountains and Pacific
+coast bundled into the same vector. This is deliberately not the complete
+Seattle node yet. It isolates the operation so we can see what bundling does
+before the next slide applies it to all of the Location data.
 
 The important idea here is that a bundled hypervector remains somewhat similar to every
 association that's inside it. That’s what makes it searchable. If a later query
 contains mountains, it can still match the larger Seattle bundle, even if the
 query doesn’t contain every other Seattle feature. Unlike a discrete graph that needs an exact match via the query, this bunded hypervector behaves like partial matching over a collection of properties.
 
-At the bottom you that just like binding, bundling is also invertible. If we don't to associate
+At the bottom you can see that just like binding, bundling is also invertible. If we don't to associate
 Seattle with mountains, we unbundle (or subtract) that association from the running
 total. If we want it back, we bundle (or add) it again. This is basically like updating a distributed memory with vector arithmetic. More on that towards the end of this talk.
 
-So, to summarize, binding creates one typed property association. Bundling gathers many of
-those associations into one searchable hypervector, that's more or less equivalent to a full node in the property graph.
+So, to summarize, binding is association, bundling is superposition.
 -->
 
 ---
 layout: default
-class: feature-query-slide
+class: semantic-projection-slide
 ---
 
-<div class="operation-content">
-  <Eyebrow>Why binding and bundling belong together</Eyebrow>
-  <h1>Can a query find Seattle without naming it?</h1>
-  <div class="query-construction" aria-label="Constructing the HDC query from natural language">
-    <div class="query-language">
-      <small>USER QUERY</small>
-      <strong>“Cities on the Pacific coast with mountains nearby”</strong>
+<div class="semantic-projection-content">
+  <Eyebrow>Applying binding and bundling</Eyebrow>
+  <h1>How is the hypervector encoded?</h1>
+  <p class="lede">Every property contributes. The projected semantic evidence is weighted so its geometry remains visible inside the structural bundle.</p>
+
+  <section class="semantic-projection-visual" aria-label="The complete Seattle Location row is encoded as a structural property sum and an eight-times-weighted semantic hypervector, then bundled into one full Location hypervector">
+    <div class="encoder-context">
+      <div class="structural-context">
+        <small>STRUCTURAL VIEW · COMPLETE LOCATION ROW</small>
+        <strong><code>name</code> Seattle · <code>kind</code> Location · <code>region</code> pacific_northwest · <code>timezone</code> pacific · …</strong>
+        <span>bind every key to its value, then bundle → <b>structural sum</b></span>
+      </div>
+      <div class="semantic-context">
+        <small>SEMANTIC VIEW · LOCATION EVIDENCE</small>
+        <strong>“Mountain skyline · Puget Sound · Pacific Northwest”</strong>
+        <span>Text embedding model produces the normalized 768-dim embedding below.</span>
+      </div>
     </div>
-    <b class="query-step-arrow">→</b>
-    <div class="query-extractor">
-      <small>EXTRACT “VIBES”</small>
-      <strong>Rule-based engine <span>in this demo</span></strong>
-      <p>or a small local LLM</p>
+    <div class="projection-stage">
+      <div class="projection-vector input-vector">
+        <small>NOMIC-EMBED-TEXT</small>
+        <strong>1 × 768</strong>
+        <div class="coarse-cells" aria-label="Sampled continuous embedding values">
+          <i class="vneg"></i><i class="vpos"></i><i class="vpos"></i><i class="vneg"></i><i class="vneg"></i><i class="vpos"></i><i class="vpos"></i><i class="vneg"></i><i class="vpos"></i><i class="vneg"></i><i class="vpos"></i><i class="vneg"></i>
+        </div>
+        <span>768 continuous values</span>
+      </div>
+      <b class="projection-operator">×</b>
+      <div class="projection-matrix">
+        <small>FIXED RADEMACHER MATRIX · R</small>
+        <strong>768 × 10,000</strong>
+        <div class="matrix-axes">
+          <span class="matrix-rows">768 rows</span>
+          <div class="rademacher-grid" aria-label="Sample of a random binary plus or minus one matrix">
+            <i class="rp">+</i><i class="rn">−</i><i class="rp">+</i><i class="rp">+</i><i class="rn">−</i><i class="rn">−</i><i class="rp">+</i><i class="rn">−</i>
+            <i class="rn">−</i><i class="rn">−</i><i class="rp">+</i><i class="rn">−</i><i class="rp">+</i><i class="rp">+</i><i class="rn">−</i><i class="rp">+</i>
+            <i class="rp">+</i><i class="rn">−</i><i class="rn">−</i><i class="rp">+</i><i class="rp">+</i><i class="rn">−</i><i class="rp">+</i><i class="rn">−</i>
+            <i class="rn">−</i><i class="rp">+</i><i class="rp">+</i><i class="rn">−</i><i class="rn">−</i><i class="rp">+</i><i class="rn">−</i><i class="rp">+</i>
+            <i class="rp">+</i><i class="rp">+</i><i class="rn">−</i><i class="rn">−</i><i class="rp">+</i><i class="rn">−</i><i class="rn">−</i><i class="rp">+</i>
+            <i class="rn">−</i><i class="rp">+</i><i class="rn">−</i><i class="rp">+</i><i class="rn">−</i><i class="rp">+</i><i class="rp">+</i><i class="rn">−</i>
+          </div>
+          <span class="matrix-columns">10,000 columns</span>
+        </div>
+      </div>
+      <div class="vote-gate">
+        <code>sign</code>
+        <span>weighted<br/>majority vote</span>
+      </div>
+      <b class="projection-operator">=</b>
+      <div class="projection-vector output-vector">
+        <small>TRANSIENT SEMANTIC HYPERVECTOR</small>
+        <strong>1 × 10,000</strong>
+        <div class="fine-cells" aria-label="Sampled bipolar hypervector values">
+          <i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rp"></i><i class="rn"></i><i class="rn"></i><i class="rp"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rp"></i><i class="rp"></i><i class="rn"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rp"></i><i class="rn"></i><i class="rn"></i><i class="rp"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i><i class="rp"></i><i class="rn"></i>
+        </div>
+        <span>10,000 bipolar values</span>
+      </div>
     </div>
-    <b class="query-step-arrow">→</b>
-    <div class="query-vibes">
-      <small>NORMALIZED FEATURE STRINGS</small>
-      <div><code>pacific_coast</code><code>mountains</code><code>nature_access</code><code>waterfront</code></div>
-      <span>All four are encoded; two are expanded below.</span>
+    <div class="projection-math">
+      <code>semantic_hv = sign(xR) &nbsp; where &nbsp; x ∈ ℝ<sup>1×768</sup>, &nbsp; R ∈ {−1,+1}<sup>768×10,000</sup></code>
+      <code class="node-sum-equation">Location.hv = structural_hv + 8 × semantic_hv</code>
     </div>
-  </div>
-  <div class="feature-query-layout">
-    <div class="stored-node-card">
-      <small>STORED NODE HYPERVECTOR</small>
-      <strong>Location:Seattle</strong>
-      <code>S<sub>Seattle</sub> = L<sub>mountains</sub> ⊕ L<sub>pacific_coast</sub> ⊕ …</code>
-      <i class="node-vector-stripe"></i>
-      <div><span>L<sub>mountains</sub></span><span>L<sub>pacific_coast</sub></span></div>
+    <div class="holistic-assembly">
+      <div class="channel-term structural-term"><small>STRUCTURAL COMPONENT</small><code>⊕ (key ⊗ value)</code></div>
+      <b>⊕</b>
+      <div class="channel-term semantic-term"><small>WEIGHTED SEMANTIC COMPONENT</small><code>8 × semantic_hv</code></div>
+      <b>→</b>
+      <div class="seattle-node-result"><small>NODE HYPERVECTOR</small><strong>Seattle · <code>Location.hv</code></strong></div>
+      <span>the only Location vector persisted</span>
     </div>
-    <div class="cosine-bridge"><span>cosine</span><b>↔</b><small>compare</small></div>
-    <div class="feature-query-list">
-      <div class="feature-query hit"><span>QUERY</span><code>T<sub>Location</sub> ⊗ A<sub>mountains</sub></code><strong>L<sub>mountains</sub></strong></div>
-      <div class="feature-query hit"><span>QUERY</span><code>T<sub>Location</sub> ⊗ A<sub>pacific_coast</sub></code><strong>L<sub>pacific_coast</sub></strong></div>
-      <div class="feature-query query-sum"><span>BUNDLE</span><code>Q = L<sub>mountains</sub> ⊕ L<sub>pacific_coast</sub> ⊕ …</code><strong>Location query</strong></div>
-    </div>
-  </div>
-  <div class="meaning-split">
-    <div><small>QUERY ASKS</small><strong>Which Location hypervectors best match this bundle of features?</strong></div>
-    <div><small>HDC FINDS THE ANSWER!</small><strong>A location may be returned even if it matches only part of the query</strong></div>
-  </div>
-  <p class="operation-takeaway"><strong>Binding scopes each feature to the <code>Location</code> type;</strong> bundling represents the whole <code>Location:Seattle</code> record.</p>
+  </section>
+  <p class="semantic-takeaway"><code>Location.hv</code> is both the complete node representation and the vector searched by semantic queries.</p>
 </div>
 
 <style>
-.feature-query-slide .node-vector-stripe{display:block;height:42px;margin-top:20px;border-radius:5px;background-image:linear-gradient(90deg,#ff9e80 0 12%,#716b66 12% 28%,#a28cff 28% 45%,#716b66 45% 59%,#ff9e80 59% 77%,#716b66 77% 89%,#a28cff 89%)}
-.feature-query-slide .operation-content>.lede{display:flex;align-items:center;gap:12px}.feature-query-slide .operation-content>.lede b{padding:5px 8px;border:1px solid rgba(255,115,74,.38);border-radius:5px;background:rgba(255,115,74,.07);color:var(--accent-soft);font:700 10px 'Geist Mono',ui-monospace,monospace;letter-spacing:.12em}.feature-query-slide .operation-content>.lede span{color:rgba(240,231,220,.92)}
-.feature-query-layout{display:grid;grid-template-columns:1fr 94px 1.08fr;gap:17px;height:282px;margin-top:22px}.stored-node-card,.feature-query-list{border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.76)}.stored-node-card{display:flex;flex-direction:column;justify-content:center;padding:25px}.stored-node-card>small{color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.11em}.stored-node-card>strong{margin-top:7px;color:var(--fg);font-size:22px}.stored-node-card>code,.feature-query code{padding:0!important;border-radius:0!important;background:transparent!important}.stored-node-card>code{margin-top:14px;color:rgba(240,231,220,.7)!important;font:14px 'Geist Mono',ui-monospace,monospace}.stored-node-card .node-vector-stripe{margin-top:20px}.stored-node-card>div{display:flex;gap:9px;margin-top:18px}.stored-node-card>div span{padding:7px 10px;border:1px solid rgba(162,140,255,.35);border-radius:7px;color:#c2b7ff;font:12px 'Geist Mono',ui-monospace,monospace}.cosine-bridge{display:flex;flex-direction:column;align-items:center;justify-content:center}.cosine-bridge span{color:rgba(240,231,220,.54);font:12px 'Geist Mono',ui-monospace,monospace}.cosine-bridge b{margin:8px 0;color:var(--accent);font-size:32px}.cosine-bridge small{color:rgba(240,231,220,.45);font-size:12px}.feature-query-list{display:flex;flex-direction:column;padding:9px 19px}.feature-query{display:grid;grid-template-columns:55px 1fr 126px;align-items:center;gap:10px;flex:1}.feature-query+.feature-query{border-top:1px solid var(--border)}.feature-query>span{color:rgba(240,231,220,.44);font-size:10px;font-weight:750;letter-spacing:.1em}.feature-query code{color:var(--fg)!important;font:13px 'Geist Mono',ui-monospace,monospace}.feature-query strong{font-size:13px;text-align:right}.feature-query.hit strong{color:var(--accent-soft)}.feature-query.miss strong{color:rgba(240,231,220,.48)}.meaning-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.meaning-split>div{display:flex;align-items:center;gap:14px;padding:12px 16px;border-left:2px solid var(--accent);background:rgba(255,115,74,.04)}.meaning-split>div:last-child{border-left-color:#a28cff;background:rgba(162,140,255,.04)}.meaning-split small{color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.1em}.meaning-split>div:last-child small{color:#b8aaff}.meaning-split strong{color:rgba(240,231,220,.84);font-size:15px}.feature-query-slide .operation-takeaway{margin-top:17px}
-</style>
-
-<style>
-.query-construction{display:grid;grid-template-columns:1.25fr 28px .72fr 28px 1.38fr;align-items:center;gap:9px;height:78px;margin-top:12px;padding:10px 14px;border:1px solid var(--border-strong);border-radius:11px;background:rgba(15,13,11,.7)}.query-construction small{display:block;color:var(--accent-soft);font-size:8px;font-weight:750;letter-spacing:.1em}.query-language strong{display:block;margin-top:4px;color:rgba(240,231,220,.9);font-size:13px;line-height:1.25}.query-step-arrow{color:rgba(255,115,74,.72);font-size:20px;text-align:center}.query-extractor{padding-left:2px}.query-extractor strong{display:block;margin-top:4px;color:var(--fg);font-size:13px}.query-extractor strong span{color:rgba(240,231,220,.5);font-size:10px;font-weight:500}.query-extractor p{margin:2px 0 0;color:rgba(240,231,220,.6);font-size:11px}.query-vibes>div{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px;margin-top:4px}.query-vibes code{padding:0!important;border-radius:0!important;background:transparent!important;color:#b8aaff!important;font:10.5px/1.15 'Geist Mono',ui-monospace,monospace}.query-vibes>span{display:block;margin-top:3px;color:rgba(240,231,220,.5);font-size:9px}.feature-query-slide .feature-query-layout{height:240px;margin-top:13px}.feature-query-slide .stored-node-card{padding:20px}.feature-query-slide .stored-node-card>code{margin-top:11px}.feature-query-slide .stored-node-card .node-vector-stripe{height:34px;margin-top:14px}.feature-query-slide .stored-node-card>div{margin-top:12px}.feature-query-slide .meaning-split{margin-top:12px}.feature-query-slide .meaning-split>div{padding:10px 14px}.feature-query-slide .operation-takeaway{margin-top:13px}
+.slidev-layout.semantic-projection-slide{padding:82px 84px 28px}
+.semantic-projection-content h1{margin:10px 0 5px;font-size:40px;line-height:1.08;letter-spacing:-.025em}
+.semantic-projection-content>.lede{margin:0;color:rgba(240,231,220,.82);font-size:18px}
+.semantic-projection-visual{height:372px;margin-top:14px;padding:14px 18px;border:1px solid var(--border-strong);border-radius:15px;background:rgba(15,13,11,.76)}
+.encoder-context{display:grid;grid-template-columns:1.16fr .84fr;gap:16px;height:66px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+.encoder-context>div{min-width:0}.encoder-context small,.projection-stage small,.holistic-assembly small{display:block;color:rgba(240,231,220,.48);font:700 8px 'Geist Mono',ui-monospace,monospace;letter-spacing:.09em}.encoder-context strong{display:block;margin-top:5px;overflow:hidden;color:rgba(240,231,220,.86);font-size:11.5px;line-height:1.24;white-space:nowrap;text-overflow:ellipsis}.encoder-context code{padding:0!important;background:transparent!important;color:var(--accent-soft)!important;font:10px 'Geist Mono',ui-monospace,monospace}.encoder-context span{display:block;margin-top:4px;color:rgba(240,231,220,.53);font-size:10px}.encoder-context b{color:#8bdcff}.semantic-context{padding-left:14px;border-left:1px solid rgba(123,216,255,.2)}.semantic-context strong{color:#8bdcff;font-style:italic}
+.projection-stage{display:grid;grid-template-columns:184px 20px 190px 58px 20px 1fr;align-items:center;gap:8px;height:140px;padding-top:10px}.projection-vector,.projection-matrix{min-width:0}.projection-vector strong,.projection-matrix strong{display:block;margin-top:3px;color:var(--fg);font:700 11px 'Geist Mono',ui-monospace,monospace}.projection-vector>span{display:block;margin-top:4px;color:rgba(240,231,220,.46);font:9px 'Geist Mono',ui-monospace,monospace;text-align:center}.projection-operator{color:var(--accent);font-size:22px;text-align:center}.coarse-cells{display:grid;grid-template-columns:repeat(12,1fr);height:31px;margin-top:9px;overflow:hidden;border:1px solid rgba(240,231,220,.12);border-radius:4px}.coarse-cells i{display:grid;place-items:center;min-width:0;border-right:1px solid rgba(15,13,11,.46);font:6.5px 'Geist Mono',ui-monospace,monospace;font-style:normal}.coarse-cells i:last-child{border-right:0}.coarse-cells .vpos{background:#8bdcff}.coarse-cells .vneg{background:#493d38}.matrix-axes{position:relative;margin-top:7px;padding:0 0 13px 28px}.rademacher-grid{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(6,13px);overflow:hidden;border:1px solid rgba(240,231,220,.13);border-radius:3px}.rademacher-grid i{display:grid;place-items:center;border-right:1px solid rgba(15,13,11,.3);border-bottom:1px solid rgba(15,13,11,.3);font:700 7px 'Geist Mono',ui-monospace,monospace;font-style:normal}.rademacher-grid .rp,.fine-cells .rp{background:#8bdcff}.rademacher-grid .rn,.fine-cells .rn{background:#493d38}.rademacher-grid .rp{color:rgba(7,16,20,.22)}.rademacher-grid .rn{color:rgba(240,231,220,.22)}.matrix-rows{position:absolute;left:0;top:23px;transform:rotate(-90deg);transform-origin:center;color:rgba(240,231,220,.42);font:7px 'Geist Mono',ui-monospace,monospace}.matrix-columns{position:absolute;right:0;bottom:1px;color:rgba(240,231,220,.42);font:7px 'Geist Mono',ui-monospace,monospace}.vote-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;height:68px;border-left:1px solid rgba(255,115,74,.25);border-right:1px solid rgba(255,115,74,.25)}.vote-gate code{padding:3px 5px!important;background:rgba(255,115,74,.08)!important;color:var(--accent-soft)!important;font:700 12px 'Geist Mono',ui-monospace,monospace}.vote-gate span{margin-top:6px;color:rgba(240,231,220,.48);font:7.5px/1.2 'Geist Mono',ui-monospace,monospace;text-align:center}.fine-cells{display:grid;grid-template-columns:repeat(48,1fr);height:31px;margin-top:9px;overflow:hidden;border:1px solid rgba(240,231,220,.12);border-radius:4px}.fine-cells i{min-width:0;border-right:1px solid rgba(15,13,11,.24)}
+.projection-math{display:grid;grid-template-columns:1fr 1.15fr;align-items:center;gap:18px;height:60px;padding:8px 12px;border-top:1px solid rgba(123,216,255,.18);border-bottom:1px solid rgba(123,216,255,.18);background:rgba(55,168,215,.035)}.projection-math code{padding:0!important;background:transparent!important;color:#8bdcff!important;font:12px 'Geist Mono',ui-monospace,monospace;white-space:nowrap}.projection-math .node-sum-equation{color:var(--accent-soft)!important;text-align:center}.projection-math sup{font-size:8px}
+.holistic-assembly{position:relative;display:grid;grid-template-columns:1fr 22px 1fr 28px 1.05fr;align-items:center;gap:8px;height:78px;padding:9px 10px 15px}.holistic-assembly>b{color:var(--accent);font-size:19px;text-align:center}.channel-term,.seattle-node-result{min-width:0;padding:7px 9px;border:1px solid rgba(240,231,220,.12);border-radius:7px;background:rgba(240,231,220,.025)}.channel-term code,.seattle-node-result code{padding:0!important;background:transparent!important;color:rgba(240,231,220,.82)!important;font:9.5px 'Geist Mono',ui-monospace,monospace;white-space:nowrap}.semantic-term{border-color:rgba(123,216,255,.27)}.seattle-node-result{border-color:rgba(255,115,74,.38);background:rgba(255,115,74,.05)}.seattle-node-result strong{display:block;margin-top:3px;color:var(--fg);font-size:13px}.seattle-node-result code{color:var(--accent-soft)!important}.holistic-assembly>span{position:absolute;right:11px;bottom:1px;color:rgba(240,231,220,.38);font:7px 'Geist Mono',ui-monospace,monospace}.semantic-takeaway{margin:17px 0 0;color:rgba(240,231,220,.88);font-size:17px;font-weight:500;text-align:center}.semantic-takeaway code{color:#8bdcff}.semantic-takeaway strong{color:var(--accent-soft)}
 </style>
 
 <!--
-Let's see how building such a node hypervector helps use answe fuzzy queries. Can we find Seattle without naming it?
+Now that we have seen binding and bundling separately, we can look at how we encode the
+notion of a "Location". An encoder's job is to produce a hypervector of the specified dimensionality from the specified inputs. To encode the meaningful representation of a node, we'd need to combine binding and bundling into our encoder design.
 
-The query is fuzzy: “Cities on the Pacific
-coast with mountains nearby.” HDC doesn’t work directly with natural language, so we
-first encode the query into a query hypervector, using the same codebook.
+There are two components we use: a structural component, and a semantic component.
+The structural path starts with every property in the Location row:
+the name, node kind, region, timezone, description, image path, and the other
+fields, and hashes these symbolic tokens into a seeded random value, which is then used to generate the 10 thousand dimensional hypervector.
 
-In this demo, a simple rule recognizes “Pacific coast” and “mountains,” then
-returns four normalized features: Pacific coast, mountains, nature access, and
-waterfront. Think of it as a tiny query planner. It converts natural language
-into terms that can be looked up in hypervector space.
+Then, we have a semantic component begins with the location description, which is a traditional text field that describes the location. We use a traditional text embedding model here, to converts that text into a normalized text embedding with 768 dimensions.  As we know, this captures semantic meaning in the text description. That's the left strip in this slide (with the coarse bars), with the blue values indicating positive floats and the grey values indicating negative floats.
 
-In a more realistic example, you could imagine using a small,
-locally running language model could do the same constrained job: return a short
-list of vocabulary-aligned clues, or “vibes.” It isn’t answering the question or
-traversing the graph. It’s only normalizing the user’s intent into keyword terms.
+But now we have a problem: our semantic component is only 768 dimensions in size, but our hypervectors need to be 10 thousand dimensions in size.
 
-Once we have those clues, we use the same recipe as we used for Seattle. We look
-up each term, bind it to the role “feature,” associate it with the Location type,
-and bundle all four into one query hypervector.
+The answer is this: We project the lower dimensional text embedding up into hypervector space.
+The math works something like this.
+We multiply that row by one fixed discrete random matrix (called a Rademacher matrix), which
+768 by 10000, Every value in this matrix is either plus one or minus one.
+The intuition with why we multiply is that the output column can be thought of
+as a weighted majority vote: the column either keeps or flips each of the 768
+semantic twxt embedding values, so we add those contributions, and
+the sign of the result (not its value) what we use for the hypervector. A positive total
+becomes plus one; a negative total becomes minus one. Doing that for all ten thousand columns
+produces the 10 thousand dimension bipolar semantically encoded
+hypervector on the right, which is what we want.
 
-The symmetry here is important. The stored Location and the query use the
-same vocabulary and operations, so they can be compared in the same vector
-space. Notice that the query never asks for Seattle explicitly. It contains only the node type
-we want and the features we care about.
+Finally, to combine them into a "Seattle node" hypervector,
+the encoder bundles the structural sum with eight copies of the
+semantic hypervector. The semantic weight prevents its geometry from being
+diluted by the ten structural property associations in this Location schema.
+The resulting Location dot hv is the complete node representation for Seattle
+and the only Location hypervector persisted.
 
-On retrieval, we compare the query with the hypervector on every Location record using
-cosine similarity. This isn’t an all-or-nothing property filter. A Location can
-still rank as useful when it matches only part of the description.
-
-HDC has now given us a fuzzy way to discover a promising Location node. From
-that entry point, the graph can take over for exact traversal.
+Why did we do all this? So that a query that's something like  “mountainous cities
+near the Pacific Ocean” , which doesn't exactly name the word "mountain",
+is still encoded semantically, but it's now compared
+directly with the complete Seattle node hypervector representation. So we can really
+capture some fuzzy intent in the queries this way in hypervector space.
 -->
 
 ---
@@ -1684,8 +1629,8 @@ class: spo-slide
         <div><span>key:name</span><b>⊗</b><span>value:Seattle</span></div>
         <div><span>key:region</span><b>⊗</b><span>value:pacific_northwest</span></div>
       </div>
-      <div class="spo-operation"><b>⊕</b><span>bundle · Location table</span></div>
-      <div class="spo-result"><i class="spo-vector object-vector"></i><strong>O = bundle(Seattle properties)</strong></div>
+      <div class="spo-operation"><b>⊕</b><span>bundle · structural + semantic</span></div>
+      <div class="spo-result"><i class="spo-vector object-vector"></i><strong>O = full Location.hv for Seattle</strong></div>
     </div>
     <div class="spo-panel spo-bind">
       <div class="spo-head"><small>4 · <code>VISITED</code> TABLE</small><strong>Final S·P·O hypervector</strong></div>
@@ -1704,10 +1649,10 @@ Speaker notes:
 - `encode_properties` binds every key to its value, then stores the bundle of those bound pairs in each node row. Maya and Seattle have more properties than the two shown here.
 - The predicate comes from the relationship table name `VISITED` and is encoded deterministically as `predicate:VISITED`; it is not fetched from a separate table row.
 - `encode_triple` calls `normalize_for_binding` on the composite subject and object only at this boundary, then binds S*, P, and O* into `VISITED.hv`.
-- This distinction is visible in the rebuilt LanceDB tables: node rows contain full-precision bundles (for example Location.hv spans −10…10), while VISITED.hv contains only −1/+1.
+- Location.hv is the full raw superposition of the structural property sum and the eight-times-weighted semantic hypervector. It is normalized only when it becomes the object factor in VISITED.hv.
 - Bipolar factors preserve MAP's self-inverse binding: known subject and predicate factors recover the stored object factor exactly.
 - MAP binding is commutative, so the relationship row's `person_id` and `location_id` columns preserve edge direction; the bound vector alone does not.
-- `Location.vibe_hv`, used in the later retrieval slides, is the separate bundled vector for fuzzy multimodal evidence.
+- Location stores only one hypervector column. The same full-node Location.hv is used for semantic search and graph composition.
 -->
 
 <style>
@@ -1730,6 +1675,86 @@ Finally, we have the Location Seattle, which we already showed before how to bin
 Putting these three together, we can now apply another associative binding operation to combine them into one FINAL hypervector that represents that *path* between Maya Chen and Seattle.
 
 So hopefully, it makes sense how clean and composable this kind of algebra is. Using these two simple operations of binding and bundling, you can represent both nodes and relationships entirely in hypervector space. We've essentially transformed a discrete space into a continuous space using vector arithmetic. Because the algebra is invertible, you can recover its parts by running the corresponding inverse operation.
+-->
+
+---
+layout: default
+class: visitor-query-slide
+---
+
+<div class="visitor-query-content">
+  <Eyebrow>From fuzzy intent to an exact graph path</Eyebrow>
+  <h1>Can we find Seattle’s visitors without naming Seattle?</h1>
+  <p class="lede">The semantic query retrieves a full Location node; the graph then follows its stored <code>VISITED</code> edges.</p>
+  <div class="visitor-query-flow" aria-label="A natural-language query is projected into HDC space, compared with full Location node hypervectors, and expanded through exact VISITED graph edges">
+    <section class="visitor-query-stage query-encode-stage">
+      <small>1 · ENCODE THE QUERY</small>
+      <blockquote>“persons who visited cities on the Pacific coast”</blockquote>
+      <div class="query-encode-steps">
+        <span>Nomic<br/><b>768-D</b></span><i>→</i><span>sign(xR)<br/><b>10,000-D</b></span>
+      </div>
+      <div class="query-hv-band"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p><code>query_hv</code> is semantic only. No feature extraction or query-side bundling.</p>
+    </section>
+    <b class="visitor-flow-arrow">→</b>
+    <section class="visitor-query-stage full-node-stage">
+      <small>2 · SEARCH THE FULL NODE COLUMN</small>
+      <div class="full-node-formula"><code>Location.hv</code><span>= structural sum ⊕ 8 × semantic_hv</span></div>
+      <div class="cosine-compare"><span>query_hv</span><b>cosine</b><span>Location.hv</span></div>
+      <div class="candidate-location">
+        <div><small>TOP LOCATION</small><strong>Seattle</strong></div>
+        <em>0.410</em>
+      </div>
+      <p>The weighted semantic term keeps the complete node searchable from natural language.</p>
+    </section>
+    <b class="visitor-flow-arrow">→</b>
+    <section class="visitor-query-stage graph-expand-stage">
+      <small>3 · FOLLOW EXACT GRAPH EDGES</small>
+      <code class="visitor-cypher">(:Person)-[:VISITED]→<br/>(:Location {name: "Seattle"})</code>
+      <div class="visitor-results">
+        <div><b>M</b><span>Maya Chen</span></div>
+        <div><b>R</b><span>Robby Jo</span></div>
+      </div>
+      <p>The embedding finds the city. Stored edges determine its visitors.</p>
+    </section>
+  </div>
+  <div class="retrieval-responsibilities">
+    <div><small>HDC ANSWERS</small><strong>Which full Location node best matches the fuzzy description?</strong></div>
+    <div><small>THE GRAPH ANSWERS</small><strong>Which people are actually connected to it by <code>VISITED</code>?</strong></div>
+  </div>
+  <p class="visitor-query-takeaway"><strong>Seattle is inferred from meaning;</strong> Maya and Robby are returned from facts.</p>
+</div>
+
+<style>
+.slidev-layout.visitor-query-slide{padding:84px 84px 34px}.visitor-query-content h1{margin:10px 0 6px;font-size:40px;line-height:1.08;letter-spacing:-.025em}.visitor-query-content>.lede{margin:0;color:rgba(240,231,220,.84);font-size:19px}.visitor-query-content>.lede code{color:var(--accent-soft)}.visitor-query-flow{display:grid;grid-template-columns:1fr 34px 1.08fr 34px .92fr;align-items:stretch;gap:10px;height:292px;margin-top:20px}.visitor-query-stage{min-width:0;padding:18px;border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.76)}.visitor-query-stage>small{display:block;color:var(--accent-soft);font:700 9px 'Geist Mono',ui-monospace,monospace;letter-spacing:.1em}.visitor-flow-arrow{display:grid;place-items:center;color:var(--accent);font-size:29px}.query-encode-stage blockquote{margin:15px 0 12px;padding:0;border:0;color:var(--fg);font-size:17px;font-style:italic;line-height:1.3}.query-encode-steps{display:grid;grid-template-columns:1fr 24px 1fr;align-items:center;gap:5px}.query-encode-steps span{padding:7px 5px;border:1px solid rgba(123,216,255,.2);border-radius:6px;color:rgba(240,231,220,.62);font:9px/1.2 'Geist Mono',ui-monospace,monospace;text-align:center}.query-encode-steps b{color:#8bdcff;font-size:10px}.query-encode-steps i{color:var(--accent);font-style:normal;text-align:center}.query-hv-band{display:grid;grid-template-columns:repeat(24,1fr);height:27px;margin-top:12px;overflow:hidden;border-radius:4px}.query-hv-band i{background:#8bdcff;border-right:1px solid rgba(15,13,11,.28)}.query-hv-band i:nth-child(3n),.query-hv-band i:nth-child(7n),.query-hv-band i:nth-child(11n){background:#493d38}.visitor-query-stage>p{margin:12px 0 0;color:rgba(240,231,220,.58);font-size:11.5px;line-height:1.35}.visitor-query-stage>p code{color:#8bdcff}.full-node-stage{border-color:rgba(123,216,255,.26)}.full-node-formula{margin-top:17px;padding:12px;border-left:2px solid #8bdcff;background:rgba(55,168,215,.045)}.full-node-formula code{display:block;padding:0!important;background:transparent!important;color:#8bdcff!important;font:700 14px 'Geist Mono',ui-monospace,monospace}.full-node-formula span{display:block;margin-top:5px;color:rgba(240,231,220,.68);font:10px 'Geist Mono',ui-monospace,monospace}.cosine-compare{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-top:13px;color:rgba(240,231,220,.68);font:10px 'Geist Mono',ui-monospace,monospace;text-align:center}.cosine-compare b{padding:4px 7px;border-radius:999px;background:rgba(255,115,74,.09);color:var(--accent-soft);font-size:9px}.candidate-location{display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding:10px 12px;border:1px solid rgba(255,115,74,.35);border-radius:8px;background:rgba(255,115,74,.05)}.candidate-location small{display:block;color:rgba(240,231,220,.48);font:700 8px 'Geist Mono',ui-monospace,monospace;letter-spacing:.08em}.candidate-location strong{display:block;margin-top:3px;color:var(--fg);font-size:18px}.candidate-location em{color:var(--accent-soft);font-size:20px;font-style:normal;font-weight:750}.graph-expand-stage{border-color:rgba(162,140,255,.28)}.visitor-cypher{display:block;margin-top:17px;padding:12px!important;border-radius:7px!important;background:rgba(162,140,255,.055)!important;color:#c2b7ff!important;font:10px/1.5 'Geist Mono',ui-monospace,monospace}.visitor-results{display:flex;flex-direction:column;gap:8px;margin-top:14px}.visitor-results>div{display:flex;align-items:center;gap:10px}.visitor-results b{display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(255,115,74,.38);border-radius:50%;color:var(--accent-soft);font:700 10px 'Geist Mono',ui-monospace,monospace}.visitor-results span{color:var(--fg);font-size:15px;font-weight:600}.retrieval-responsibilities{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:19px}.retrieval-responsibilities>div{display:flex;align-items:center;gap:14px;padding:11px 15px;border-left:2px solid #8bdcff;background:rgba(55,168,215,.035)}.retrieval-responsibilities>div:last-child{border-left-color:#a28cff;background:rgba(162,140,255,.035)}.retrieval-responsibilities small{color:#8bdcff;font:700 9px 'Geist Mono',ui-monospace,monospace;letter-spacing:.09em;white-space:nowrap}.retrieval-responsibilities>div:last-child small{color:#b8aaff}.retrieval-responsibilities strong{color:rgba(240,231,220,.82);font-size:13px}.retrieval-responsibilities code{color:#c2b7ff}.visitor-query-takeaway{margin:19px 0 0;color:rgba(240,231,220,.94);font-size:22px;font-weight:500;text-align:center}.visitor-query-takeaway strong{color:var(--accent-soft)}
+</style>
+
+<style>
+.feature-query-slide .node-vector-stripe{display:block;height:42px;margin-top:20px;border-radius:5px;background-image:linear-gradient(90deg,#ff9e80 0 12%,#716b66 12% 28%,#a28cff 28% 45%,#716b66 45% 59%,#ff9e80 59% 77%,#716b66 77% 89%,#a28cff 89%)}
+.feature-query-slide .operation-content>.lede{display:flex;align-items:center;gap:12px}.feature-query-slide .operation-content>.lede b{padding:5px 8px;border:1px solid rgba(255,115,74,.38);border-radius:5px;background:rgba(255,115,74,.07);color:var(--accent-soft);font:700 10px 'Geist Mono',ui-monospace,monospace;letter-spacing:.12em}.feature-query-slide .operation-content>.lede span{color:rgba(240,231,220,.92)}
+.feature-query-layout{display:grid;grid-template-columns:1fr 94px 1.08fr;gap:17px;height:282px;margin-top:22px}.stored-node-card,.feature-query-list{border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.76)}.stored-node-card{display:flex;flex-direction:column;justify-content:center;padding:25px}.stored-node-card>small{color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.11em}.stored-node-card>strong{margin-top:7px;color:var(--fg);font-size:22px}.stored-node-card>code,.feature-query code{padding:0!important;border-radius:0!important;background:transparent!important}.stored-node-card>code{margin-top:14px;color:rgba(240,231,220,.7)!important;font:14px 'Geist Mono',ui-monospace,monospace}.stored-node-card .node-vector-stripe{margin-top:20px}.stored-node-card>div{display:flex;gap:9px;margin-top:18px}.stored-node-card>div span{padding:7px 10px;border:1px solid rgba(162,140,255,.35);border-radius:7px;color:#c2b7ff;font:12px 'Geist Mono',ui-monospace,monospace}.cosine-bridge{display:flex;flex-direction:column;align-items:center;justify-content:center}.cosine-bridge span{color:rgba(240,231,220,.54);font:12px 'Geist Mono',ui-monospace,monospace}.cosine-bridge b{margin:8px 0;color:var(--accent);font-size:32px}.cosine-bridge small{color:rgba(240,231,220,.45);font-size:12px}.feature-query-list{display:flex;flex-direction:column;padding:9px 19px}.feature-query{display:grid;grid-template-columns:55px 1fr 126px;align-items:center;gap:10px;flex:1}.feature-query+.feature-query{border-top:1px solid var(--border)}.feature-query>span{color:rgba(240,231,220,.44);font-size:10px;font-weight:750;letter-spacing:.1em}.feature-query code{color:var(--fg)!important;font:13px 'Geist Mono',ui-monospace,monospace}.feature-query strong{font-size:13px;text-align:right}.feature-query.hit strong{color:var(--accent-soft)}.feature-query.miss strong{color:rgba(240,231,220,.48)}.meaning-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.meaning-split>div{display:flex;align-items:center;gap:14px;padding:12px 16px;border-left:2px solid var(--accent);background:rgba(255,115,74,.04)}.meaning-split>div:last-child{border-left-color:#a28cff;background:rgba(162,140,255,.04)}.meaning-split small{color:var(--accent-soft);font-size:10px;font-weight:750;letter-spacing:.1em}.meaning-split>div:last-child small{color:#b8aaff}.meaning-split strong{color:rgba(240,231,220,.84);font-size:15px}.feature-query-slide .operation-takeaway{margin-top:17px}
+</style>
+
+<style>
+.query-construction{display:grid;grid-template-columns:1.25fr 28px .72fr 28px 1.38fr;align-items:center;gap:9px;height:78px;margin-top:12px;padding:10px 14px;border:1px solid var(--border-strong);border-radius:11px;background:rgba(15,13,11,.7)}.query-construction small{display:block;color:var(--accent-soft);font-size:8px;font-weight:750;letter-spacing:.1em}.query-language strong{display:block;margin-top:4px;color:rgba(240,231,220,.9);font-size:13px;line-height:1.25}.query-step-arrow{color:rgba(255,115,74,.72);font-size:20px;text-align:center}.query-extractor{padding-left:2px}.query-extractor strong{display:block;margin-top:4px;color:var(--fg);font-size:13px}.query-extractor strong span{color:rgba(240,231,220,.5);font-size:10px;font-weight:500}.query-extractor p{margin:2px 0 0;color:rgba(240,231,220,.6);font-size:11px}.query-vibes>div{display:grid;grid-template-columns:1fr 1fr;gap:3px 6px;margin-top:4px}.query-vibes code{padding:0!important;border-radius:0!important;background:transparent!important;color:#b8aaff!important;font:10.5px/1.15 'Geist Mono',ui-monospace,monospace}.query-vibes>span{display:block;margin-top:3px;color:rgba(240,231,220,.5);font-size:9px}.feature-query-slide .feature-query-layout{height:240px;margin-top:13px}.feature-query-slide .stored-node-card{padding:20px}.feature-query-slide .stored-node-card>code{margin-top:11px}.feature-query-slide .stored-node-card .node-vector-stripe{height:34px;margin-top:14px}.feature-query-slide .stored-node-card>div{margin-top:12px}.feature-query-slide .meaning-split{margin-top:12px}.feature-query-slide .meaning-split>div{padding:10px 14px}.feature-query-slide .operation-takeaway{margin-top:13px}
+</style>
+
+<!--
+Now we can ask this question. Can we find who visited Seattle without actually naming Seattle?
+
+The query comes in in natural language, and it's passed through the same encoding
+process we just saw. This produces the query hypervector, which we then
+compare directly with the Location hypervector
+column. Let's recall that each stored hypervector contains the bundled *structural* properties
+plus an 8x-weighted semantic hypervector. With that weighting, our pure
+natural-language query can still "see" the semantics inside the complete
+node's hypervector geometry. For this query, Seattle is the top Location with a
+cosine score of 0.410. The score is just a signal for ranking, not a probability.
+
+Next, we can let the traditional knowledge graph take over. We can traverse VISITED edges from each candidate Location. Now that we're not inferring Maya and Robby from the
+embedding, and we didn't arrive at the entry points through traditional vector search on the
+properties alone. We arrived here through the entire path we encoded via HDC, and
+the hypervector similarity search returned those person IDs are returned.
 -->
 
 ---
@@ -1787,7 +1812,7 @@ class: permutation-slide
 </style>
 
 <!--
-There's a third operation in HDC, permutation. On the previous slide, we turned a complete path: Person -VISITED-> Location into a hypervector. But what if Maya visits two places and we need to know which came first?
+Let's round up our intro to HDC algebra with its third operator, permutation. On the previous slide, we turned a complete path: Person -VISITED-> Location into a hypervector. But what if Maya visits two places and we need to know which came first?
 
 In a property graph, we’d add a timestamp or sequence number to each VISITED
 relationship. HDC can put that order directly into the vector using an operation
@@ -1817,10 +1842,9 @@ That lets us recover that the Space Needle was Maya’s first visit.
 
 Note that permutation doesn’t understand the concept of time by itself. It's just like a sequence property in a database, we decide that one arrangement means first and another means second.
 
-The demo for this talk uses only binding and bundling, but not permutation. I’m only including
-it as a future direction for ordered histories and agent memory. But for now, let’s return
-to the implementation and see where the graph rows, hypervectors, and multimodal
-evidence come together
+We didn't use permutation for the the demo in this talk uses, we only used only binding and bundling. But permutation is definitely worth understanding because it's important to store
+ordered histories for associative memory, which helps us do machine learning with HDC.
+But for now, let’s return to our walkthrough and see how the graph rows, hypervectors, and multimodal evidence come together!
 -->
 
 ---
@@ -1835,7 +1859,7 @@ class: lance-stack-slide
   <div class="lance-stack-layout">
     <div class="lance-stack-copy">
       <div class="stack-point"><b>Lance format</b><p>Arrow-native, columnar, and versioned. Structured properties, fixed-size float16 hypervectors, and image bytes stay in one dataset built for fast scans and random access.</p></div>
-      <div class="stack-point"><b>LanceDB</b><p>Creates the graph tables, evolves them with <code>hv</code> and <code>vibe_hv</code>, then runs one cosine search over <code>Location.vibe_hv</code> to rank matching cities.</p></div>
+      <div class="stack-point"><b>LanceDB</b><p>Creates the graph tables, adds one <code>hv</code> column per row, then runs cosine search over the full-node <code>Location.hv</code> values to rank matching cities.</p></div>
       <div class="stack-point"><b><code>lance-graph</code></b><p>Maps the same Lance datasets into node labels and directed relationships, then runs exact Cypher patterns without copying the rows into another graph store.</p></div>
       <div class="stack-point why"><b>Why agents care</b><p>LanceDB retrieves the multimodal bytes + metadata;<br/><code>lance-graph</code> traverses the paths as a property graph. Both use the same underlying rows (no copying data).</p></div>
     </div>
@@ -1862,7 +1886,7 @@ class: lance-stack-slide
       <div class="lance-format-layer">
         <div class="format-heading"><small>SHARED STORAGE LAYER</small><strong class="format-brand"><img src="./assets/lance-logo-gray.svg" alt="" aria-hidden="true"/><span>Lance format</span></strong></div>
         <div class="dataset-row"><span>Person.lance</span><span>Location.lance</span><span>VISITED.lance</span></div>
-        <div class="column-row"><span>properties</span><span>hv + vibe_hv · f16</span><span>image (blob)</span></div>
+        <div class="column-row"><span>properties</span><span>one hv · f16</span><span>image (blob)</span></div>
         <div class="format-traits">columnar <b>·</b> versioned <b>·</b> fast scans & random-access</div>
       </div>
     </div>
@@ -1877,7 +1901,8 @@ class: lance-stack-slide
 <!--
 From a storage perspective, graph traversal and hypervector search should not need separate copies of the data. This slide views how I think about this through the LanceDB lens.
 
-We start at the bottom with Lance format. Lance is a columnar, Arrow-native lakehouse format that stores data in tables, with strictly typed schemas. In this demo, Person, Location, and VISITED are three Lance tables. The same table can hold scalars, fixed-size hypervectors, and multimodal assets such as image bytes as separate columns. Lance also gives us versioning, schema evolution, fast scans, and random access.
+We start at the bottom with Lance format, where our graph and multimodal data for
+this demo is stored. Lance is a columnar, Arrow-native lakehouse format that stores data in tables, with strictly typed schemas. In this demo, Person, Location, and VISITED are three Lance tables. The same table can hold scalars, fixed-size hypervectors, and multimodal assets such as image bytes as separate columns. Lance also gives us versioning, schema evolution, fast scans, and random access.
 
 Above that are two separate engines that operate over those tables. LanceDB is the data management layer above the format. It offers a lot of convenience utilities to run similarity search via an index over the hypervectors, so a fuzzy request such as “Pacific coast, mountains, and nature access” can produce ranked, likely entities.
 
@@ -1899,28 +1924,31 @@ class: results-slide
   <p class="lede"><code>lance-graph</code> expands paths between entities either in Cypher or SQL. LanceDB does vector search</p>
   <div class="score-chart">
     <div class="score-axis"><span>0.0</span><span>0.2</span><span>0.4</span><span>0.6</span><span>0.8</span></div>
-    <div class="threshold-line"><span>threshold 0.20</span></div>
-    <div class="score-row seattle"><div class="score-label"><strong>Seattle</strong><small>Maya Chen · Robby Jo</small></div><div class="score-track"><i></i><b></b><em>0.742</em></div><div class="score-features"><span>mountains</span><span>pacific_coast</span><span>scenic_urban</span></div></div>
-    <div class="score-row slc"><div class="score-label"><strong>Salt Lake City</strong><small>Elena Park</small></div><div class="score-track"><i></i><b></b><em>0.444</em></div><div class="score-features"><span>mountains</span><span>nature_access</span><span>mountain_west</span></div></div>
+    <div class="score-row seattle"><div class="score-label"><strong>Seattle</strong><small>Maya Chen · Robby Jo</small></div><div class="score-track"><i></i><b></b><em>0.507</em></div><div class="score-features"><span>mountains</span><span>pacific_coast</span><span>scenic_urban</span></div></div>
+    <div class="score-row slc"><div class="score-label"><strong>Salt Lake City</strong><small>Elena Park</small></div><div class="score-track"><i></i><b></b><em>0.434</em></div><div class="score-features"><span>mountains</span><span>nature_access</span><span>mountain_west</span></div></div>
   </div>
-  <div class="result-caption"><span>Retrieved context:</span><b>score ∆ 0.298</b><strong>Difference: <code>pacific-coast</code> evidence</strong></div>
+  <div class="result-caption"><span>Top-two ranking:</span><b>margin 0.073</b><strong>Seattle retains the stronger Pacific-coast signal</strong></div>
   <p class="results-takeaway">Both results are plausible. <strong>The agent can reason over ranked context.</strong></p>
 </div>
 
 <style>
-.slidev-layout.results-slide,.slidev-layout.near-miss-slide{padding:88px 84px 44px}.results-content h1,.near-miss-content h1{margin:10px 0 6px;font-size:40px;line-height:1.1;letter-spacing:-.025em}.results-content>.lede,.near-miss-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:21px}.results-content>.lede code{color:var(--accent-soft);font-family:'Geist Mono',ui-monospace,monospace}.score-chart{position:relative;margin-top:25px;padding:50px 24px 20px;border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.76)}.score-axis{position:absolute;left:227px;right:259px;top:16px;display:flex;justify-content:space-between;color:rgba(240,231,220,.48);font:12px 'Geist Mono',ui-monospace,monospace}.threshold-line{position:absolute;left:calc(227px + (100% - 486px)*.25);top:42px;bottom:19px;border-left:1px dashed var(--accent)}.threshold-line span{position:absolute;top:-20px;left:6px;width:110px;color:var(--accent-soft);font:12px 'Geist Mono',ui-monospace,monospace}.score-row{display:grid;grid-template-columns:180px 1fr 235px;align-items:center;gap:18px;min-height:118px}.score-row+.score-row{border-top:1px solid var(--border)}.score-label strong{display:block;color:var(--fg);font-size:22px}.score-label small{display:block;margin-top:6px;color:rgba(240,231,220,.6);font-size:14px}.score-track{position:relative;height:25px;border-radius:999px;background:rgba(240,231,220,.09)}.score-track i{position:absolute;left:0;top:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent-soft))}.seattle .score-track i{width:92.75%}.slc .score-track i{width:55.5%;background:linear-gradient(90deg,#8c766d,#d78a72)}.score-track b{position:absolute;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);border:3px solid var(--bg-deep);border-radius:50%;background:var(--accent-soft)}.seattle .score-track b{left:92.75%}.slc .score-track b{left:55.5%;background:#d78a72}.score-track em{position:absolute;top:-31px;transform:translateX(-50%);color:var(--accent-soft);font-size:22px;font-style:normal;font-weight:750}.seattle .score-track em{left:92.75%}.slc .score-track em{left:55.5%;color:#d78a72}.score-features{display:flex;flex-wrap:wrap;gap:7px}.score-features span{padding:7px 8px;border:1px solid var(--border-strong);border-radius:7px;color:rgba(240,231,220,.74);font:12px 'Geist Mono',ui-monospace,monospace}.result-caption{display:flex;justify-content:center;align-items:center;gap:25px;margin-top:17px;padding:12px;border:1px solid var(--border-strong);border-radius:10px;background:rgba(15,13,11,.78)}.result-caption span{color:rgba(240,231,220,.58);font:13px 'Geist Mono',ui-monospace,monospace}.result-caption b{color:var(--accent-soft);font-size:18px}.result-caption strong{color:rgba(240,231,220,.88);font-size:16px}.results-takeaway,.near-miss-takeaway{margin:19px 0 0;color:rgba(240,231,220,.96);font-size:24px;font-weight:500;text-align:center}.results-takeaway strong,.near-miss-takeaway strong{color:var(--accent-soft)}
+.slidev-layout.results-slide,.slidev-layout.near-miss-slide{padding:88px 84px 44px}.results-content h1,.near-miss-content h1{margin:10px 0 6px;font-size:40px;line-height:1.1;letter-spacing:-.025em}.results-content>.lede,.near-miss-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:21px}.results-content>.lede code{color:var(--accent-soft);font-family:'Geist Mono',ui-monospace,monospace}.score-chart{position:relative;margin-top:25px;padding:50px 24px 20px;border:1px solid var(--border-strong);border-radius:14px;background:rgba(15,13,11,.76)}.score-axis{position:absolute;left:227px;right:259px;top:16px;display:flex;justify-content:space-between;color:rgba(240,231,220,.48);font:12px 'Geist Mono',ui-monospace,monospace}.score-row{display:grid;grid-template-columns:180px 1fr 235px;align-items:center;gap:18px;min-height:118px}.score-row+.score-row{border-top:1px solid var(--border)}.score-label strong{display:block;color:var(--fg);font-size:22px}.score-label small{display:block;margin-top:6px;color:rgba(240,231,220,.6);font-size:14px}.score-track{position:relative;height:25px;border-radius:999px;background:rgba(240,231,220,.09)}.score-track i{position:absolute;left:0;top:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent-soft))}.seattle .score-track i{width:63.375%}.slc .score-track i{width:54.25%;background:linear-gradient(90deg,#8c766d,#d78a72)}.score-track b{position:absolute;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);border:3px solid var(--bg-deep);border-radius:50%;background:var(--accent-soft)}.seattle .score-track b{left:63.375%}.slc .score-track b{left:54.25%;background:#d78a72}.score-track em{position:absolute;top:-31px;transform:translateX(-50%);color:var(--accent-soft);font-size:22px;font-style:normal;font-weight:750}.seattle .score-track em{left:63.375%}.slc .score-track em{left:54.25%;color:#d78a72}.score-features{display:flex;flex-wrap:wrap;gap:7px}.score-features span{padding:7px 8px;border:1px solid var(--border-strong);border-radius:7px;color:rgba(240,231,220,.74);font:12px 'Geist Mono',ui-monospace,monospace}.result-caption{display:flex;justify-content:center;align-items:center;gap:25px;margin-top:17px;padding:12px;border:1px solid var(--border-strong);border-radius:10px;background:rgba(15,13,11,.78)}.result-caption span{color:rgba(240,231,220,.58);font:13px 'Geist Mono',ui-monospace,monospace}.result-caption b{color:var(--accent-soft);font-size:18px}.result-caption strong{color:rgba(240,231,220,.88);font-size:16px}.results-takeaway,.near-miss-takeaway{margin:19px 0 0;color:rgba(240,231,220,.96);font-size:24px;font-weight:500;text-align:center}.results-takeaway strong,.near-miss-takeaway strong{color:var(--accent-soft)}
 </style>
 
 <!--
-With that stack in place, this is what retrieval looks like. We extract the query features, bind each one to its role, and bundle them into a query hypervector.  Kind of what we do in traditional vector search, except here, we pass it through the encoder, rather than an embedding model.
+This is what retrieval looks like. The query goes
+through traditional text embedding and the fixed random projection encoder to produce a semantic query hypervector.
 
-We compare the query hypervector with each location’s bundled evidence hypervector using cosine similarity, which we then rank and threshold.
+We compare that query hypervector with the complete Location hypervectors using cosine
+similarity and keep the top-k results.
 
-Seattle scores the highest at 0.742. It matches the mountains and Pacific coast clues, and the graph connects it to Maya and Robby. Salt Lake City ranks lower at 0.444, but it still clears the threshold of 0.2 because mountains and nature access are meaningful matches.
+As we'd expect, Seattle ranks first with a score of 0.507. It matches the mountains and Pacific coast clues, and the graph connects it to Maya and Robby. Salt Lake City remains a meaningful
+runner-up at 0.434 because it strongly matches the mountainous part.
 
-The gap of 0.298 reflects the missing Pacific coast evidence. Both cities are plausible enough to keep in context. Instead of forcing an early yes-or-no decision, we give the agent ranked candidates it can reason over.
+The top-two margin is 0.073. Both cities can remain useful context without
+pretending that either cosine score is calibrated confidence.
 
-So why keep that second result at all? The comparison on the next slide makes the value clearer.
+So why keep that second result at all? Agents can reason over this kind of context, so there's no reason to throw away results that might be meaningful in a fuzzy way.
 -->
 
 ---
@@ -1934,16 +1962,16 @@ class: near-miss-slide
   <p class="lede" style="font-size:21px;color:rgba(240,231,220,.88)">Salt Lake City shares meaningful evidence (mountains) with the query; yet, it's got some differences.</p>
   <div class="city-evidence-compare">
     <div class="evidence-city seattle-city">
-      <div class="evidence-photo"><img src="./assets/seattle.jpg" alt="Seattle skyline"/><strong>0.742</strong><span>Seattle, WA</span></div>
+      <div class="evidence-photo"><img src="./assets/seattle.jpg" alt="Seattle skyline"/><strong>0.507</strong><span>Seattle, WA</span></div>
       <div class="aligned-features"><span class="yes">✓ mountains</span><span class="yes">✓ nature_access</span><span class="yes emph">✓ pacific_coast</span><span class="yes">✓ waterfront</span></div>
     </div>
     <div class="shared-column"><span>shared</span><i></i><b>mountains</b><b>nature</b><i></i><strong>difference</strong></div>
     <div class="evidence-city slc-city">
-      <div class="evidence-photo"><img src="./assets/salt-lake-city.jpg" alt="Salt Lake City skyline"/><strong>0.444</strong><span>Salt Lake City, UT</span></div>
+      <div class="evidence-photo"><img src="./assets/salt-lake-city.jpg" alt="Salt Lake City skyline"/><strong>0.434</strong><span>Salt Lake City, UT</span></div>
       <div class="aligned-features"><span class="yes">✓ mountains</span><span class="yes">✓ nature_access</span><span class="no">✕ pacific_coast</span><span class="no">✕ waterfront</span></div>
     </div>
   </div>
-  <div class="binary-vs-ranked"><div><small>GRAPH: EXACT FILTER</small><strong>match / no match</strong></div><b>→</b><div><small>HDC: ASSOCIATIVE RANKING</small><strong>0.742 &gt; 0.444 &gt; threshold</strong></div></div>
+  <div class="binary-vs-ranked"><div><small>GRAPH: EXACT FILTER</small><strong>match / no match</strong></div><b>→</b><div><small>HDC: ASSOCIATIVE RANKING</small><strong>0.507 &gt; 0.434 · top-k</strong></div></div>
   <p class="near-miss-takeaway" style="font-size:24px"><center><strong> In a graph, everything depends on reaching the right entry point. HDC is more forgiving.</strong></center></p>
 </div>
 
@@ -1952,13 +1980,17 @@ class: near-miss-slide
 </style>
 
 <!--
-Here's the difference between an exact match filter and associative search ranking.
+This slide shows why associative search is so useful in place of an exact match. We can't
+always rely on a query having an exact hit, so associative search helps you degrade gracefully.
 
-Seattle matches all four query features, so it scores highest. Salt Lake City shares the mountains and nature evidence, but it lacks the Pacific coast and waterfront evidence. That makes it a weaker result, not a meaningless one.
+Seattle's stored evidence aligns with the mountains, nature, Pacific coast, and
+waterfront ideas, so it scores highest. Salt Lake City shares the mountains and
+nature evidence but lacks the Pacific coast and waterfront signals. This makes
+it a weaker result, not a meaningless one.
 
 A filtered graph traversal in Cypher tends to give us a binary result: either a match or no match. If Pacific coast is required, Salt Lake City disappears completely. HDC degrades more gracefully: it preserves the partial match and places it lower in the ranking.
 
-That matters when an agent begins with an incomplete description. It can still reach a useful part of the graph instead of falling off a cliff. This way, the HDC similarity can tells the agent what could be relevant, allowing it to verify further from the facts if needed.
+That matters when an agent begins with an incomplete description. This way, the HDC similarity can tells the agent what could be relevant, allowing it to verify further from the facts if needed.
 -->
 
 ---
@@ -1973,9 +2005,9 @@ class: validation-slide
   <div class="validation-pipeline">
     <div class="candidate-stage">
       <div class="stage-title"><span>HDC CANDIDATES</span><strong>could be related</strong></div>
-      <div class="candidate-row"><b>0.742</b><span>Maya</span><i>VISITED</i><span>Seattle</span></div>
-      <div class="candidate-row"><b>0.742</b><span>Robby</span><i>VISITED</i><span>Seattle</span></div>
-      <div class="candidate-row"><b>0.444</b><span>Elena</span><i>VISITED</i><span>Salt Lake City</span></div>
+      <div class="candidate-row"><b>0.507</b><span>Maya</span><i>VISITED</i><span>Seattle</span></div>
+      <div class="candidate-row"><b>0.507</b><span>Robby</span><i>VISITED</i><span>Seattle</span></div>
+      <div class="candidate-row"><b>0.434</b><span>Elena</span><i>VISITED</i><span>Salt Lake City</span></div>
       <small>LanceDB retrieves entities and features; lance-graph expands the paths around them</small>
     </div>
     <div class="validation-arrow">→</div>
@@ -2015,7 +2047,7 @@ ORDER BY p.name</code></pre>
 </style>
 
 <!--
-HDC gave us ranked possibilities. Now we can separate relevant results from known facts.
+HDC shows us what *could* be true, but the graph shows us what's *known to be true*. The two can go hand-in-hand.
 
 On the left, HDC proposes three candidate paths. The scores say the cities resemble the query, but they do not prove that these people visited them.
 
@@ -2047,14 +2079,14 @@ class: receipt-slide
       <strong>One graph record, now evidence-bearing</strong>
       <div class="row-field"><span>properties</span><code>name · region</code></div>
       <div class="row-field feature-list-field"><span>features</span><code>mountains · waterfront · pacific coast</code></div>
-      <div class="row-field vector-field"><span>vibe_hv</span><i></i></div>
+      <div class="row-field vector-field"><span>hv</span><i></i></div>
       <div class="row-field"><span>image</span><code>binary blob · raw JPEG bytes</code></div>
     </div>
     <div class="row-outcomes">
       <div class="row-outcome retrieval-outcome">
         <small>THIS DEMO</small>
-        <strong>Associative search with vibe_hv</strong>
-        <div><b>0.742</b><span>mountains + waterfront</span></div>
+        <strong>Associative search with full-node hv</strong>
+        <div><b>0.507</b><span>mountains + Pacific coast</span></div>
       </div>
       <div class="row-outcome evidence-outcome">
         <small>ALSO POSSIBLE</small>
@@ -2065,7 +2097,7 @@ class: receipt-slide
   </div>
   <div class="receipt-captions">
     <p>LanceDB stores source details that a traditional property graph leaves out.</p>
-    <p><code>vibe_hv</code> is built by binding each image-derived feature to its role, then bundling the associations.</p>
+    <p><code>Location.hv</code> bundles bound structural properties with weighted semantic evidence.</p>
     <p>An image embedding could add semantic image search later.</p>
   </div>
   <p class="receipt-takeaway">Agents benefit from <strong>rich context.</strong></p>
@@ -2081,16 +2113,17 @@ class: receipt-slide
 </style>
 
 <!--
-Conventional property graphs and graph databases usually leave the image itself out. They store a pointer URL, so the bytes must be fetched from another system and maintained and versioned separately from the graph.
+This talk is titled multimodal knowledge graphs, so this is where I spend a minute clarifying how we're thinking about the term "multimodal" at LanceDB. You store the data as per its source modality, and you can easily derive the representations each task needs, and store them as additional features. For HDC, those are new columns containing hypervectors. We didn't do it here, but the same table could store CLIP image embeddings to do text-to-image or image-to-image semantic search on the image contents.
 
-Here, the source modality stays with the entity. The same pattern can extend to medical scans, satellite imagery, maps, sensor streams, or any domain where structured properties cannot capture everything.
+If you've ever worked with conventional property graphs or graph databases like I have, you'll
+know that in those systems, we usually leave the image bytes out of the storage layer. They store pointer URLs, so the bytes must be fetched from another system and maintained and versioned separately from the graph.
 
-The Seattle example was just for demonstration, but the encoder is the most important thing.
-The encoder decides which signals to extract, how to bind them to roles, and which representation to derive. In this demo, it converts image-derived labels into the vibe hypervector used for HDC search.
+In Lance, the source modality stays with the entities themselves.
+The Seattle example here was just to make things easier to understand, but in HDC, the encoder design is the most important thing. The encoder decides which signals to extract, how to bind structural properties, and how strongly semantic evidence should contribute.
 
-We did not add an image embedding here, but the same row could store one for text-to-image or image-to-image semantic search. A different encoder gives the agent another useful view without changing the graph's factual structure.
+This is also the payoff for agents: richer context. They can retrieve an entity, traverse its relationships, inspect the source modality, and use the representation best suited to the task.
 
-That is the payoff for agents: richer context. They can retrieve an entity, traverse its relationships, inspect the source modality, and use the representation best suited to the task.
+From the toy example shown in this talk, we can actually extend this to some fascinating multimodal use cases in medical scanning, satellite imagery, maps, sensor streams, or any domain where structured properties cannot capture everything useful.
 -->
 
 ---
@@ -2103,7 +2136,7 @@ class: architecture-slide
   <h1>One dataset, multiple views.</h1>
   <p class="lede">Graph topology, structured facts, hypervectors, and raw image bytes stay co-located and co-versioned.</p>
   <div class="architecture-map" style="height:335px">
-    <div class="arch-consumer similarity"><span>HYPERVECTORS + VECTORS</span><strong>cosine over <code>vibe_hv</code></strong><small>associative search</small></div>
+    <div class="arch-consumer similarity"><span>HYPERVECTORS + VECTORS</span><strong>cosine over <code>Location.hv</code></strong><small>full-node associative search</small></div>
     <div class="arch-arrow a1">↖</div>
     <div class="arch-consumer traversal"><span>GRAPH</span><strong><code>lance-graph</code></strong><small>exact topology</small></div>
     <div class="arch-arrow a2">↑</div>
@@ -2113,8 +2146,8 @@ class: architecture-slide
       <div class="core-brand"><img src="./assets/lancedb-icon-gray.svg" alt="" aria-hidden="true"/><strong>LanceDB</strong><span>Vector search · Cypher · SQL · Raw bytes</span></div>
       <div class="table-stack">
         <div><b>Person</b><span>properties</span><span>hv · f16</span></div>
-        <div><b>VISITED</b><span>person_id · location_id</span><span>vibe_hv · f16</span></div>
-        <div><b>Location</b><span>properties · image (blob)</span><span>hv · vibe_hv · f16</span></div>
+        <div><b>VISITED</b><span>person_id · location_id</span><span>hv · f16</span></div>
+        <div><b>Location</b><span>properties · image (blob)</span><span>hv · f16</span></div>
       </div>
       <div class="format-note" style="display:none"><span>Lance format layer</span><b>fixed-size float16 vector columns</b></div>
     </div>
@@ -2137,13 +2170,10 @@ class: architecture-slide
 </style>
 
 <!--
-This is the architecture that enables this. Person, VISITED, and Location form one LanceDB dataset containing properties, graph keys, hypervectors, and image bytes.
+So just to recap, LanceDB was used to enable this. Unlike a traditional database, we use a lakehouse architecture to combine multiple data sources into one Lance dataset containing properties, graph keys, hypervectors, and image bytes.
 
-We can think of graph topology, structured data, hypervectors and multimodal bytes as different views of the same data. Because these views are co-located and co-versioned, the similarity score, graph relationship, and supporting image all refer to the same data version. There are no separate stores to synchronize.
-
-I also want to emphasize that hypervectors by themselves aren't a replacement for graphs. They find a promising entry point; the graph supplies exact structure; the source modality supplies evidence. For really large datasets, a graph is still a more compact representation that occupies less disk space. Both representations have their own benefits.
-
-This leaves one big practical question: how do we store and search 10,000-dimensional vectors efficiently?
+Essentially, we can think of graph topology, structured data, hypervectors, multimodal bytes, and other things like sensor traces, as different views of the same larger dataset. But because of the lakehouse-style design of LanceDB, these views are co-located and co-versioned,  and any
+particular similarity score, graph relationship, and supporting image all refer to the same data version. There's no multiple different databases, tools and systems to keep in sync.
 -->
 
 ---
@@ -2153,7 +2183,7 @@ class: precision-slide
 
 <div class="precision-content">
   <div class="precision-badge">START WITH THE DEFAULTS · SCALE-OUT WITH COMPRESSION</div>
-  <h1>Compute in f32. Persist in f16. Index with RaBitQ at scale.</h1>
+  <h1>Compute in f32. Persist in f16. Quantize the index at scale.</h1>
   <p class="lede">Precision (compute) and compression (storage) are controlled at different boundaries.</p>
   <div class="precision-flow">
     <section class="precision-stage compute-stage">
@@ -2178,8 +2208,8 @@ class: precision-slide
       <small>3 · LANCEDB (RETRIEVAL) · INDEX</small>
       <strong><code>IVF_RQ</code> · RaBitQ</strong>
       <i class="precision-vector bit-vector"></i>
-      <code>1 bit / dimension</code>
-      <p>≈ 1.25 KB code + correction values</p>
+      <code>1-4 bits / dimension</code>
+      <p>≈ 1.25-5 KB code + correction values</p>
       <em>Compressed index; the base f16 column remains.</em>
     </section>
   </div>
@@ -2196,7 +2226,7 @@ class: precision-slide
 </style>
 
 <!--
-This slide separates three decisions: compute precision, storage precision, and retrieval indexing.
+One important question about storage is worth addressing. How can we keep things efficient as we add more data? This slide separates the question into three different levers that we can tune: compute precision, storage precision, and retrieval indexing.
 
 First, we need to keep the HDC algebra in float32. TorchHD requires this, because it does binding, bundling, permutation, and prototype updates there, which lend themselves to floating point operations. At 10,000 dimensions, each completed vector is about 40 kilobytes.
 
@@ -2326,7 +2356,7 @@ class: next-edge-slide
 </style>
 
 <!--
-We'll end with some food for thought for the machine learning folks in the audience. Could the same algebra for retrieving similar graph entities work for predicting graph relationships?
+As we approach the end we'll conclude with some food for thought for the machine learning folks in the audience. Could the same algebra for retrieving similar graph entities work for predicting graph relationships?
 
 In HDC literature, each possible outcome has a "prototype": which is a memory built by bundling the encoded examples associated with that outcome. It works somewhat like computing a centroid. Features that are recurring across examples reinforce one another, while one-off details tend to fade, leaving a representative memory of that outcome.
 
@@ -2398,9 +2428,13 @@ class: reproduce-slide
 </style>
 
 <!--
-I'll close with three thoughts. First, graphs do not have to stop at links to multimodal data. Lance lets us keep the graph, vectors, and original evidence together. Second, HDC gives us an algebra for combining that evidence with graph structure, so similarity can respect roles, direction, and history. Third, associative memory hints at what could come next: lightweight learning over graph events with a fixed representation.
+Alright, thanks for staying with me till the end! I always love sharing reproducible code, not just ideas.
 
-The complete demo is open source at the repository here, so you can work with actual TorchHD code and generate your own hypervectors for your own problem domains, hopefully with LanceDB in the mix. The whole tool chain shown here is open source.
+So the complete demo is open source at the repository here, so you can work with actual TorchHD code and generate your own hypervectors for your own problem domains, hopefully with LanceDB in the mix. The whole tool chain shown here is open source, and you can just `pip install lancedb` and the other dependencies to get started.
 
-HDC literature is typically very research-focused, so I hope this talk gave you a more practical understanding of these concepts. I only scratched the surface here, but I'll be working more on these kinds of problems with David Hughes, who is far deeper into these topics than I am.  If any of these ideas sparked more questions, please come find both David and me after the talk. We'd love to chat.
+I find that HDC literature is typically very research-focused with very little focus on how things are stored, so I really wanted to build something myself, to gain the intuition on this fascinating topic. And I know I work at LanceDB, but it really does provide all the right primitives to make HDC practical for real world use cases.
+
+I only scratched the surface here in this talk, but the good news is that I'll soon be working more on these kinds of problems with David Hughes, also at LanceDB, who is far deeper into the weeds on these topics than I am.  If any of these ideas sparked more questions, please come find both David and me after the talk. We'd love to chat.
+
+Thank you!
 -->
