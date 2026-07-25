@@ -2379,7 +2379,7 @@ class: reproduce-slide
 <div class="reproduce-content">
   <Eyebrow>Build your own open-source implementation</Eyebrow>
   <h1>Take the demo with you.</h1>
-  <p class="lede">The complete implementation, from graph traversal to image & vector retrieval is available in the repo below.</p>
+  <p class="lede">The complete implementation and this presentation are both available below.</p>
 
   <div class="run-pipeline-full" aria-label="Demo pipeline from graph ingest to image evidence">
     <div class="pipeline-stage"><b>01</b><span>Store multimodal + graph data</span></div>
@@ -2394,14 +2394,24 @@ class: reproduce-slide
   </div>
 
   <div class="closing-links">
-    <a class="repo-link" href="https://github.com/prrao87/hdc-lancedb">
-      <carbon-logo-github class="repo-icon" aria-hidden="true" />
-      <span>
-        <small>PUBLIC REPOSITORY</small>
-        <strong>github.com/prrao87/hdc-lancedb</strong>
-        <em>Code, setup, and the complete demo</em>
-      </span>
-    </a>
+    <div class="resource-links">
+      <a class="repo-link" href="https://github.com/prrao87/hdc-lancedb">
+        <carbon-logo-github class="resource-icon repo-icon" aria-hidden="true" />
+        <span>
+          <small>PUBLIC REPOSITORY</small>
+          <strong>github.com/prrao87/hdc-lancedb</strong>
+          <em>Code, setup, and the complete demo</em>
+        </span>
+      </a>
+      <a class="repo-link deck-link" href="https://prrao87.github.io/slidev-talks/graphcon-2026/#/1">
+        <i class="resource-icon deck-icon" aria-hidden="true">↗</i>
+        <span>
+          <small>LIVE PRESENTATION</small>
+          <strong>prrao87.github.io/slidev-talks/graphcon-2026/#/1</strong>
+          <em>Slides, diagrams, and animations</em>
+        </span>
+      </a>
+    </div>
     <div class="follow-block">
       <small>FOLLOW LANCEDB</small>
       <div class="social-row">
@@ -2424,13 +2434,15 @@ class: reproduce-slide
 </div>
 
 <style>
-.slidev-layout.reproduce-slide{padding:88px 84px 44px}.reproduce-content h1{margin:10px 0 6px;font-size:44px;line-height:1.08;letter-spacing:-.025em}.reproduce-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:21px}.run-pipeline-full{display:grid;grid-template-columns:1fr 42px 1fr 42px 1fr 42px 1fr 42px 1fr;align-items:stretch;width:100%;height:144px;margin-top:30px;padding:16px 20px;border-top:1px solid var(--border-strong);border-bottom:1px solid var(--border-strong);background:linear-gradient(90deg,rgba(255,115,74,.025),rgba(255,115,74,.07),rgba(255,115,74,.025))}.run-pipeline-full>i{display:grid;place-items:center;color:var(--accent);font-size:30px;font-style:normal}.pipeline-stage{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.pipeline-stage b{display:grid;place-items:center;width:39px;height:39px;border:1px solid rgba(255,115,74,.38);border-radius:50%;background:rgba(255,115,74,.09);color:var(--accent-soft);font:700 13px 'Geist Mono',ui-monospace,monospace}.pipeline-stage span{margin-top:13px;color:var(--fg);font-size:17px;font-weight:650}.closing-links{display:grid;grid-template-columns:1.2fr .8fr;gap:46px;align-items:center;margin-top:42px}.repo-link{display:flex;align-items:center;gap:22px;min-width:0;padding:8px 0;color:inherit;text-decoration:none!important}.repo-icon{flex:0 0 auto;width:62px;height:62px;color:var(--accent-soft)}.repo-link>span{display:flex;flex-direction:column;min-width:0}.repo-link small,.follow-block>small{color:rgba(240,231,220,.5);font-size:11px;font-weight:750;letter-spacing:.11em}.repo-link strong{margin-top:8px;color:var(--fg);font:21px 'Geist Mono',ui-monospace,monospace}.repo-link em{margin-top:8px;color:rgba(240,231,220,.62);font-size:14px;font-style:normal}.follow-block{padding-left:40px;border-left:1px solid var(--border-strong)}.social-row{display:flex;align-items:center;gap:18px;margin-top:14px}.social-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border-strong);border-radius:8px;background:rgba(15,13,11,.72);color:var(--fg);text-decoration:none!important}.social-icon{width:25px;height:25px}.linkedin-icon{color:#0a66c2}.x-icon{color:var(--fg)}.social-link strong{font:16px 'Geist Mono',ui-monospace,monospace}.follow-block p{margin:13px 0 0;color:rgba(240,231,220,.62);font-size:14px;line-height:1.4}.closing-note{margin:38px 0 0;color:rgba(240,231,220,.92);font-size:22px;font-weight:550;text-align:center}
+.slidev-layout.reproduce-slide{padding:88px 84px 36px}.reproduce-content h1{margin:10px 0 6px;font-size:44px;line-height:1.08;letter-spacing:-.025em}.reproduce-content>.lede{margin:0;color:rgba(240,231,220,.88);font-size:21px}.run-pipeline-full{display:grid;grid-template-columns:1fr 42px 1fr 42px 1fr 42px 1fr 42px 1fr;align-items:stretch;width:100%;height:144px;margin-top:30px;padding:16px 20px;border-top:1px solid var(--border-strong);border-bottom:1px solid var(--border-strong);background:linear-gradient(90deg,rgba(255,115,74,.025),rgba(255,115,74,.07),rgba(255,115,74,.025))}.run-pipeline-full>i{display:grid;place-items:center;color:var(--accent);font-size:30px;font-style:normal}.pipeline-stage{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.pipeline-stage b{display:grid;place-items:center;width:39px;height:39px;border:1px solid rgba(255,115,74,.38);border-radius:50%;background:rgba(255,115,74,.09);color:var(--accent-soft);font:700 13px 'Geist Mono',ui-monospace,monospace}.pipeline-stage span{margin-top:13px;color:var(--fg);font-size:17px;font-weight:650}.closing-links{display:grid;grid-template-columns:1.28fr .72fr;gap:42px;align-items:center;margin-top:26px}.resource-links{display:flex;flex-direction:column;gap:8px}.repo-link{display:flex;align-items:center;gap:17px;min-width:0;padding:6px 0;color:inherit;text-decoration:none!important}.resource-icon{flex:0 0 auto;width:45px;height:45px;color:var(--accent-soft)}.deck-icon{display:grid;place-items:center;border:1px solid rgba(162,140,255,.42);border-radius:9px;background:rgba(162,140,255,.07);color:#b8aaff;font:500 25px 'Geist Mono',ui-monospace,monospace;font-style:normal}.repo-link>span{display:flex;flex-direction:column;min-width:0}.repo-link small,.follow-block>small{color:rgba(240,231,220,.5);font-size:10px;font-weight:750;letter-spacing:.11em}.repo-link strong{margin-top:4px;color:var(--fg);font:17px 'Geist Mono',ui-monospace,monospace;white-space:nowrap}.repo-link em{margin-top:4px;color:rgba(240,231,220,.62);font-size:12px;font-style:normal}.deck-link strong{color:#c2b7ff;font-size:15px}.follow-block{padding-left:36px;border-left:1px solid var(--border-strong)}.social-row{display:flex;align-items:center;gap:14px;margin-top:13px}.social-link{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:8px;background:rgba(15,13,11,.72);color:var(--fg);text-decoration:none!important}.social-icon{width:23px;height:23px}.linkedin-icon{color:#0a66c2}.x-icon{color:var(--fg)}.social-link strong{font:15px 'Geist Mono',ui-monospace,monospace}.follow-block p{margin:11px 0 0;color:rgba(240,231,220,.62);font-size:13px;line-height:1.35}.closing-note{margin:22px 0 0;color:rgba(240,231,220,.92);font-size:21px;font-weight:550;text-align:center}
 </style>
 
 <!--
 Alright, thanks for staying with me till the end! I always love sharing reproducible code, not just ideas.
 
 So the complete demo is open source at the repository here, so you can work with actual TorchHD code and generate your own hypervectors for your own problem domains, hopefully with LanceDB in the mix. The whole tool chain shown here is open source, and you can just `pip install lancedb` and the other dependencies to get started.
+
+The live presentation is linked here as well, so you can revisit the slides, diagrams, and animations after the talk.
 
 I find that HDC literature is typically very research-focused with very little focus on how things are stored, so I really wanted to build something myself, to gain the intuition on this fascinating topic. And I know I work at LanceDB, but it really does provide all the right primitives to make HDC practical for real world use cases.
 
